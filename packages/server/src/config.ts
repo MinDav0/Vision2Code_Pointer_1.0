@@ -116,9 +116,15 @@ function configureWindsurf(port: string) {
     const configDir = path.join(homeDir, '.codeium', 'windsurf');
     const configFile = path.join(configDir, 'mcp_config.json');
 
+    // Validate config directory path to prevent path traversal
+    const normalizedConfigDir = path.normalize(configDir);
+    if (!normalizedConfigDir.startsWith(homeDir)) {
+      throw new Error('Invalid config directory path');
+    }
+    
     // Ensure directory exists
-    if (!fs.existsSync(configDir)) {
-      fs.mkdirSync(configDir, { recursive: true });
+    if (!fs.existsSync(normalizedConfigDir)) {
+      fs.mkdirSync(normalizedConfigDir, { recursive: true });
     }
 
     // Prepare the MCP Pointer configuration
@@ -132,10 +138,16 @@ function configureWindsurf(port: string) {
 
     let windsurfConfig: any = { mcpServers: {} };
 
+    // Validate config file path to prevent path traversal
+    const normalizedConfigFile = path.normalize(configFile);
+    if (!normalizedConfigFile.startsWith(normalizedConfigDir)) {
+      throw new Error('Invalid config file path');
+    }
+    
     // Read existing config if it exists
-    if (fs.existsSync(configFile)) {
+    if (fs.existsSync(normalizedConfigFile)) {
       try {
-        const existingConfig = fs.readFileSync(configFile, 'utf8');
+        const existingConfig = fs.readFileSync(normalizedConfigFile, 'utf8');
         windsurfConfig = JSON.parse(existingConfig);
 
         // Ensure mcpServers object exists
@@ -152,7 +164,7 @@ function configureWindsurf(port: string) {
     windsurfConfig.mcpServers[MCP_SERVER_NAME] = mcpPointerConfig;
 
     // Write the updated configuration
-    fs.writeFileSync(configFile, JSON.stringify(windsurfConfig, null, 2));
+    fs.writeFileSync(normalizedConfigFile, JSON.stringify(windsurfConfig, null, 2));
 
     logger.info('✅ Successfully configured MCP Pointer for Windsurf IDE');
     logger.info(`📁 Updated: ${configFile}`);

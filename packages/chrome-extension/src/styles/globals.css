@@ -1,0 +1,202 @@
+/**
+ * Global Styles for MCP Pointer Chrome Extension
+ */
+
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* Custom CSS Variables */
+:root {
+  --mcp-primary: #3b82f6;
+  --mcp-primary-dark: #2563eb;
+  --mcp-secondary: #64748b;
+  --mcp-success: #22c55e;
+  --mcp-warning: #f59e0b;
+  --mcp-error: #ef4444;
+  --mcp-background: #ffffff;
+  --mcp-surface: #f8fafc;
+  --mcp-border: #e2e8f0;
+  --mcp-text: #0f172a;
+  --mcp-text-muted: #64748b;
+}
+
+/* Base Styles */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--mcp-text);
+  background-color: var(--mcp-background);
+}
+
+/* Extension Overlay Styles */
+.mcp-pointer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2147483647;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.mcp-pointer-overlay * {
+  pointer-events: auto;
+}
+
+/* Element Highlight Styles */
+.mcp-pointer-highlight {
+  outline: 2px solid var(--mcp-primary) !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2) !important;
+  transition: all 0.2s ease !important;
+}
+
+.mcp-pointer-highlight:hover {
+  outline-color: var(--mcp-primary-dark) !important;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3) !important;
+}
+
+/* Targeting Indicator */
+.mcp-pointer-targeting-indicator {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--mcp-primary);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  z-index: 2147483647;
+  pointer-events: none;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  animation: mcp-pulse 2s infinite;
+}
+
+@keyframes mcp-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: translateX(-50%) scale(1.05);
+  }
+}
+
+/* Popup Styles */
+.mcp-pointer-popup {
+  width: 320px;
+  min-height: 400px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+/* Content Script Styles */
+.mcp-pointer-content {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2147483647;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Element Info Panel */
+.mcp-pointer-element-panel {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  width: 320px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--mcp-border);
+  padding: 16px;
+  pointer-events: auto;
+  animation: mcp-slide-in 0.3s ease-out;
+}
+
+@keyframes mcp-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Floating Action Button */
+.mcp-pointer-fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--mcp-primary);
+  color: white;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+}
+
+.mcp-pointer-fab:hover {
+  background: var(--mcp-primary-dark);
+  transform: scale(1.05);
+  box-shadow: 0 6px 25px rgba(59, 130, 246, 0.5);
+}
+
+.mcp-pointer-fab:active {
+  transform: scale(0.95);
+}
+
+.mcp-pointer-fab.active {
+  background: var(--mcp-error);
+}
+
+.mcp-pointer-fab.active:hover {
+  background: #dc2626;
+}
+
+/* Connection Status */
+.mcp-pointer-connection-status {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  z-index: 2147483647;
+  pointer-events: none;
+  animation: mcp-fade-in 0.3s ease-out;
+}
+
+.mcp-pointer-connection-status.connected {
+  background: var(--mcp-success);
+  color: white;
+}
+
+.

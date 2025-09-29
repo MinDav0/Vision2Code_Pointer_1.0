@@ -5,20 +5,22 @@
     "moduleResolution": "bundler",
     "strict": true,
     "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
     "resolveJsonModule": true,
-    "allowSyntheticDefaultImports": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
+    "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
-      "@mcp-pointer/shared/*": ["packages/shared/src/*.ts"],
+      "@mcp-pointer/shared": ["packages/shared/src/index.ts"],
+      "@mcp-pointer/shared/*": ["packages/shared/src/*"]
     }
-  },
+  }
 }

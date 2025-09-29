@@ -1,52 +1,68 @@
 {
   "name": "@mcp-pointer/server",
-  "version": "0.4.4",
-  "description": "MCP Server for DOM element pointing - WebSocket bridge for element targeting",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/etsd-tech/mcp-pointer.git",
-    "directory": "packages/server"
-  },
+  "version": "2.0.0",
+  "description": "Secure MCP Server for element targeting with WebRTC communication",
   "type": "module",
-  "main": "dist/index.js",
+  "main": "./dist/index.js",
   "bin": {
-    "mcp-pointer": "dist/cli.cjs"
+    "mcp-pointer-server": "./dist/cli.js"
   },
   "scripts": {
-    "build": "pnpm clean && esbuild src/cli.ts --outfile=dist/cli.cjs --format=cjs --bundle  --platform=node --target=node20 --sourcemap",
-    "dev": "tsx watch src/cli.ts start",
+    "build": "bun run clean && bun build src/index.ts --outdir=dist --target=bun",
+    "build:cli": "bun run clean && bun build src/cli.ts --outfile=dist/cli.js --target=bun",
     "clean": "rm -rf dist",
+    "dev": "bun --watch src/index.ts",
+    "dev:cli": "bun --watch src/cli.ts",
     "typecheck": "tsc --noEmit",
-    "link:global": "pnpm build && pnpm link --global",
-    "build:start": "node dist/cli.cjs start",
-    "build:cli": "node dist/cli.cjs",
-    "test": "jest"
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "test:coverage": "vitest --coverage",
+    "db:init": "bun run src/database/init.ts",
+    "db:migrate": "bun run src/database/migrate.ts",
+    "db:seed": "bun run src/database/seed.ts",
+    "db:reset": "bun run src/database/init.ts --reset",
+    "db:backup": "bun run src/database/init.ts --backup",
+    "db:status": "bun run src/database/init.ts --status",
+    "db:health": "bun run src/database/init.ts --health"
   },
   "dependencies": {
+    "@mcp-pointer/shared": "workspace:*",
     "@modelcontextprotocol/sdk": "^0.5.0",
-    "commander": "^11.1.0",
-    "ws": "^8.16.0"
+    "hono": "^3.12.0",
+    "jsonwebtoken": "^9.0.2",
+    "bcryptjs": "^2.4.3",
+    "zod": "^3.22.4",
+    "better-sqlite3": "^9.2.2",
+    "redis": "^4.6.10",
+    "ws": "^8.16.0",
+    "simple-peer": "^9.11.1",
+    "helmet": "^7.1.0",
+    "cors": "^2.8.5",
+    "express-rate-limit": "^7.1.5",
+    "winston": "^3.11.0",
+    "prom-client": "^15.0.0"
   },
   "devDependencies": {
-    "@mcp-pointer/shared": "workspace:*",
-    "@types/jest": "^30.0.0",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.5",
     "@types/ws": "^8.5.10",
-    "esbuild": "catalog:",
-    "jest": "^30.1.3",
-    "ts-jest": "^29.4.1",
-    "tsx": "catalog:",
-    "typescript": "catalog:"
+    "@types/better-sqlite3": "^7.6.8",
+    "@types/cors": "^2.8.17",
+    "@types/express-rate-limit": "^6.0.0",
+    "@types/node": "^20.10.0",
+    "typescript": "^5.5.4",
+    "vitest": "^1.0.0"
   },
-  "files": [
-    "dist"
-  ],
   "keywords": [
     "mcp",
-    "ai",
-    "pointer",
-    "websocket",
+    "server",
+    "webrtc",
+    "authentication",
+    "security",
     "element-targeting"
   ],
-  "author": "MCP Pointer Team",
+  "author": "Your Company Team",
   "license": "MIT"
 }
