@@ -165,6 +165,83 @@ export class MCPServer {
           },
           required: ['code']
         }
+      },
+      {
+        name: 'analyze-element-with-ai',
+        description: 'Analyze the current element using AI to provide insights and suggestions',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            analysisType: {
+              type: 'string',
+              enum: ['accessibility', 'performance', 'semantics', 'usability', 'comprehensive'],
+              description: 'Type of analysis to perform',
+              default: 'comprehensive'
+            },
+            includeSuggestions: {
+              type: 'boolean',
+              description: 'Include improvement suggestions',
+              default: true
+            },
+            includeCodeExamples: {
+              type: 'boolean',
+              description: 'Include code examples for improvements',
+              default: true
+            }
+          }
+        }
+      },
+      {
+        name: 'generate-test-code',
+        description: 'Generate test code for the current element',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            testType: {
+              type: 'string',
+              enum: ['unit', 'integration', 'e2e', 'accessibility'],
+              description: 'Type of test to generate',
+              default: 'unit'
+            },
+            framework: {
+              type: 'string',
+              enum: ['jest', 'vitest', 'cypress', 'playwright', 'testing-library'],
+              description: 'Testing framework to use',
+              default: 'testing-library'
+            },
+            includeSetup: {
+              type: 'boolean',
+              description: 'Include test setup code',
+              default: true
+            }
+          }
+        }
+      },
+      {
+        name: 'get-cursor-context',
+        description: 'Get context information for Cursor AI integration',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            includeCodeContext: {
+              type: 'boolean',
+              description: 'Include surrounding code context',
+              default: true
+            },
+            includeFileStructure: {
+              type: 'boolean',
+              description: 'Include file structure information',
+              default: false
+            },
+            maxContextLines: {
+              type: 'number',
+              description: 'Maximum number of context lines to include',
+              default: 50,
+              minimum: 10,
+              maximum: 200
+            }
+          }
+        }
       }
     ];
   }
@@ -197,6 +274,15 @@ export class MCPServer {
           
           case 'execute-javascript':
             return await this.handleExecuteJavaScript(args);
+          
+          case 'analyze-element-with-ai':
+            return await this.handleAnalyzeElementWithAI(args);
+          
+          case 'generate-test-code':
+            return await this.handleGenerateTestCode(args);
+          
+          case 'get-cursor-context':
+            return await this.handleGetCursorContext(args);
           
           default:
             throw createAppError(ErrorCode.INVALID_INPUT, `Unknown tool: ${name}`, 400);
@@ -412,6 +498,363 @@ ${code}
         }
       ]
     };
+  }
+
+  private async handleAnalyzeElementWithAI(args: any): Promise<CallToolResult> {
+    if (!this.context?.currentElement) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: 'No element is currently pointed/selected. Please select an element first.'
+          }
+        ]
+      };
+    }
+
+    const element = this.context.currentElement;
+    const analysisType = args.analysisType || 'comprehensive';
+    const includeSuggestions = args.includeSuggestions ?? true;
+    const includeCodeExamples = args.includeCodeExamples ?? true;
+
+    // This is a placeholder implementation - in a real scenario, this would call an AI service
+    let analysis = `# AI Analysis: ${element.tagName} Element\n\n`;
+    
+    switch (analysisType) {
+      case 'accessibility':
+        analysis += this.generateAccessibilityAnalysis(element, includeSuggestions, includeCodeExamples);
+        break;
+      case 'performance':
+        analysis += this.generatePerformanceAnalysis(element, includeSuggestions, includeCodeExamples);
+        break;
+      case 'semantics':
+        analysis += this.generateSemanticAnalysis(element, includeSuggestions, includeCodeExamples);
+        break;
+      case 'usability':
+        analysis += this.generateUsabilityAnalysis(element, includeSuggestions, includeCodeExamples);
+        break;
+      case 'comprehensive':
+      default:
+        analysis += this.generateComprehensiveAnalysis(element, includeSuggestions, includeCodeExamples);
+        break;
+    }
+
+    return {
+      content: [
+        {
+          type: 'text',
+          text: analysis
+        }
+      ]
+    };
+  }
+
+  private async handleGenerateTestCode(args: any): Promise<CallToolResult> {
+    if (!this.context?.currentElement) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: 'No element is currently pointed/selected. Please select an element first.'
+          }
+        ]
+      };
+    }
+
+    const element = this.context.currentElement;
+    const testType = args.testType || 'unit';
+    const framework = args.framework || 'testing-library';
+    const includeSetup = args.includeSetup ?? true;
+
+    const testCode = this.generateTestCode(element, testType, framework, includeSetup);
+
+    return {
+      content: [
+        {
+          type: 'text',
+          text: testCode
+        }
+      ]
+    };
+  }
+
+  private async handleGetCursorContext(args: any): Promise<CallToolResult> {
+    if (!this.context?.currentElement) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: 'No element is currently pointed/selected. Please select an element first.'
+          }
+        ]
+      };
+    }
+
+    const element = this.context.currentElement;
+    const includeCodeContext = args.includeCodeContext ?? true;
+    const includeFileStructure = args.includeFileStructure ?? false;
+    const maxContextLines = args.maxContextLines || 50;
+
+    let context = `# Cursor AI Context for Element: ${element.selector}\n\n`;
+    
+    context += `## Element Information\n`;
+    context += `- **Tag:** ${element.tagName}\n`;
+    context += `- **ID:** ${element.id || 'None'}\n`;
+    context += `- **Classes:** ${element.classes?.join(', ') || 'None'}\n`;
+    context += `- **Text:** ${element.innerText?.substring(0, 100) || 'None'}\n\n`;
+
+    if (includeCodeContext) {
+      context += `## Code Context\n`;
+      context += `\`\`\`html\n`;
+      context += `<${element.tagName.toLowerCase()}${element.id ? ` id="${element.id}"` : ''}${element.classes?.length ? ` class="${element.classes.join(' ')}"` : ''}>\n`;
+      context += `${element.innerText || ''}\n`;
+      context += `</${element.tagName.toLowerCase()}>\n`;
+      context += `\`\`\`\n\n`;
+    }
+
+    if (includeFileStructure) {
+      context += `## File Structure Context\n`;
+      context += `- **URL:** ${element.url}\n`;
+      context += `- **Component:** ${element.componentInfo?.name || 'Unknown'}\n`;
+      context += `- **Source File:** ${element.componentInfo?.sourceFile || 'Unknown'}\n\n`;
+    }
+
+    context += `## Development Notes\n`;
+    context += `- Element selected at: ${new Date(element.timestamp || Date.now()).toISOString()}\n`;
+    context += `- User: ${this.context.userId}\n`;
+    context += `- Session: ${this.context.sessionId}\n`;
+
+    return {
+      content: [
+        {
+          type: 'text',
+          text: context
+        }
+      ]
+    };
+  }
+
+  // Helper methods for AI analysis
+  private generateAccessibilityAnalysis(element: TargetedElement, includeSuggestions: boolean, includeCodeExamples: boolean): string {
+    let analysis = `## Accessibility Analysis\n\n`;
+    
+    // Check for common accessibility issues
+    const issues: string[] = [];
+    const suggestions: string[] = [];
+
+    if (!element.accessibility?.ariaLabel && !element.innerText) {
+      issues.push('Missing accessible name (no aria-label or text content)');
+      suggestions.push('Add aria-label or ensure element has descriptive text content');
+    }
+
+    if (element.tagName === 'BUTTON' && !element.accessibility?.role) {
+      issues.push('Button missing explicit role');
+      suggestions.push('Ensure button has proper role attribute');
+    }
+
+    if (element.accessibility?.tabIndex === -1) {
+      issues.push('Element is not keyboard accessible (tabIndex: -1)');
+      suggestions.push('Remove tabIndex: -1 or provide alternative keyboard access');
+    }
+
+    if (issues.length === 0) {
+      analysis += `✅ **Good accessibility practices detected**\n\n`;
+    } else {
+      analysis += `⚠️ **Accessibility Issues Found:**\n`;
+      issues.forEach(issue => analysis += `- ${issue}\n`);
+      analysis += `\n`;
+    }
+
+    if (includeSuggestions && suggestions.length > 0) {
+      analysis += `## Suggestions\n`;
+      suggestions.forEach(suggestion => analysis += `- ${suggestion}\n`);
+      analysis += `\n`;
+    }
+
+    if (includeCodeExamples && suggestions.length > 0) {
+      analysis += `## Code Examples\n`;
+      analysis += `\`\`\`html\n`;
+      analysis += `<!-- Improved version -->\n`;
+      analysis += `<${element.tagName.toLowerCase()}${element.id ? ` id="${element.id}"` : ''}${element.classes?.length ? ` class="${element.classes.join(' ')}"` : ''} aria-label="Descriptive label">\n`;
+      analysis += `  Accessible content\n`;
+      analysis += `</${element.tagName.toLowerCase()}>\n`;
+      analysis += `\`\`\`\n\n`;
+    }
+
+    return analysis;
+  }
+
+  private generatePerformanceAnalysis(element: TargetedElement, includeSuggestions: boolean, includeCodeExamples: boolean): string {
+    let analysis = `## Performance Analysis\n\n`;
+    
+    // Check for performance issues
+    const issues: string[] = [];
+    const suggestions: string[] = [];
+
+    if (element.cssProperties?.display === 'none' && element.innerText) {
+      issues.push('Hidden element contains text content');
+      suggestions.push('Consider using visibility: hidden or aria-hidden for screen readers');
+    }
+
+    if (element.classes?.length && element.classes.length > 10) {
+      issues.push('Element has many CSS classes');
+      suggestions.push('Consider consolidating CSS classes for better performance');
+    }
+
+    if (issues.length === 0) {
+      analysis += `✅ **No major performance issues detected**\n\n`;
+    } else {
+      analysis += `⚠️ **Performance Considerations:**\n`;
+      issues.forEach(issue => analysis += `- ${issue}\n`);
+      analysis += `\n`;
+    }
+
+    if (includeSuggestions && suggestions.length > 0) {
+      analysis += `## Suggestions\n`;
+      suggestions.forEach(suggestion => analysis += `- ${suggestion}\n`);
+      analysis += `\n`;
+    }
+
+    return analysis;
+  }
+
+  private generateSemanticAnalysis(element: TargetedElement, includeSuggestions: boolean, includeCodeExamples: boolean): string {
+    let analysis = `## Semantic Analysis\n\n`;
+    
+    // Check semantic correctness
+    const issues: string[] = [];
+    const suggestions: string[] = [];
+
+    if (element.tagName === 'DIV' && element.innerText) {
+      issues.push('Using div for text content');
+      suggestions.push('Consider using semantic HTML elements like <p>, <span>, or <article>');
+    }
+
+    if (element.tagName === 'SPAN' && element.innerText && element.innerText.length > 100) {
+      issues.push('Long text content in span element');
+      suggestions.push('Consider using <p> or <div> for longer text content');
+    }
+
+    if (issues.length === 0) {
+      analysis += `✅ **Good semantic structure**\n\n`;
+    } else {
+      analysis += `⚠️ **Semantic Issues:**\n`;
+      issues.forEach(issue => analysis += `- ${issue}\n`);
+      analysis += `\n`;
+    }
+
+    if (includeSuggestions && suggestions.length > 0) {
+      analysis += `## Suggestions\n`;
+      suggestions.forEach(suggestion => analysis += `- ${suggestion}\n`);
+      analysis += `\n`;
+    }
+
+    return analysis;
+  }
+
+  private generateUsabilityAnalysis(element: TargetedElement, includeSuggestions: boolean, includeCodeExamples: boolean): string {
+    let analysis = `## Usability Analysis\n\n`;
+    
+    // Check usability aspects
+    const issues: string[] = [];
+    const suggestions: string[] = [];
+
+    if (element.innerText && element.innerText.length < 3) {
+      issues.push('Very short text content may be unclear');
+      suggestions.push('Ensure text content is descriptive and clear');
+    }
+
+    if (element.accessibility?.isFocusable && !element.accessibility?.ariaLabel && !element.innerText) {
+      issues.push('Focusable element lacks clear purpose');
+      suggestions.push('Add aria-label or descriptive text content');
+    }
+
+    if (issues.length === 0) {
+      analysis += `✅ **Good usability practices**\n\n`;
+    } else {
+      analysis += `⚠️ **Usability Considerations:**\n`;
+      issues.forEach(issue => analysis += `- ${issue}\n`);
+      analysis += `\n`;
+    }
+
+    if (includeSuggestions && suggestions.length > 0) {
+      analysis += `## Suggestions\n`;
+      suggestions.forEach(suggestion => analysis += `- ${suggestion}\n`);
+      analysis += `\n`;
+    }
+
+    return analysis;
+  }
+
+  private generateComprehensiveAnalysis(element: TargetedElement, includeSuggestions: boolean, includeCodeExamples: boolean): string {
+    let analysis = `# Comprehensive AI Analysis\n\n`;
+    analysis += `**Element:** ${element.tagName} (${element.selector})\n`;
+    analysis += `**Analysis Date:** ${new Date().toISOString()}\n\n`;
+    
+    analysis += this.generateAccessibilityAnalysis(element, includeSuggestions, includeCodeExamples);
+    analysis += this.generatePerformanceAnalysis(element, includeSuggestions, includeCodeExamples);
+    analysis += this.generateSemanticAnalysis(element, includeSuggestions, includeCodeExamples);
+    analysis += this.generateUsabilityAnalysis(element, includeSuggestions, includeCodeExamples);
+    
+    return analysis;
+  }
+
+  private generateTestCode(element: TargetedElement, testType: string, framework: string, includeSetup: boolean): string {
+    let testCode = `# Test Code for ${element.tagName} Element\n\n`;
+    
+    if (includeSetup) {
+      testCode += `## Setup\n`;
+      testCode += `\`\`\`javascript\n`;
+      testCode += `import { render, screen } from '@testing-library/react';\n`;
+      testCode += `import { Component } from './Component';\n\n`;
+      testCode += `describe('${element.tagName} Element Tests', () => {\n`;
+      testCode += `  beforeEach(() => {\n`;
+      testCode += `    render(<Component />);\n`;
+      testCode += `  });\n\n`;
+    }
+
+    testCode += `## ${testType.charAt(0).toUpperCase() + testType.slice(1)} Tests\n`;
+    testCode += `\`\`\`javascript\n`;
+    
+    switch (testType) {
+      case 'unit':
+        testCode += `  it('should render ${element.tagName} element', () => {\n`;
+        testCode += `    const element = screen.getByRole('${element.accessibility?.role || 'generic'}');\n`;
+        testCode += `    expect(element).toBeInTheDocument();\n`;
+        testCode += `  });\n\n`;
+        
+        if (element.innerText) {
+          testCode += `  it('should display correct text content', () => {\n`;
+          testCode += `    expect(screen.getByText('${element.innerText.substring(0, 50)}')).toBeInTheDocument();\n`;
+          testCode += `  });\n\n`;
+        }
+        break;
+        
+      case 'accessibility':
+        testCode += `  it('should be accessible', async () => {\n`;
+        testCode += `    const { container } = render(<Component />);\n`;
+        testCode += `    const results = await axe(container);\n`;
+        testCode += `    expect(results).toHaveNoViolations();\n`;
+        testCode += `  });\n\n`;
+        break;
+        
+      case 'e2e':
+        testCode += `  it('should interact with ${element.tagName} element', () => {\n`;
+        testCode += `    cy.get('${element.selector}').should('be.visible');\n`;
+        if (element.accessibility?.isFocusable) {
+          testCode += `    cy.get('${element.selector}').focus().should('be.focused');\n`;
+        }
+        testCode += `  });\n\n`;
+        break;
+    }
+
+    testCode += `\`\`\`\n\n`;
+    
+    if (includeSetup) {
+      testCode += `});\n`;
+    }
+
+    return testCode;
   }
 
   public setContext(context: MCPToolContext): void {
