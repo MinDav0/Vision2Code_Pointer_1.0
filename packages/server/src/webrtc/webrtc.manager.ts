@@ -5,7 +5,7 @@
 
 import { EventEmitter } from 'events';
 import { WebRTCService, type WebRTCConnection, type WebRTCEventData } from './webrtc.service.js';
-import type { AppConfig, ElementData, User } from '@mcp-pointer/shared';
+import type { AppConfig, TargetedElement, User } from '@mcp-pointer/shared';
 import { createAppError, ErrorCode } from '@mcp-pointer/shared';
 
 export class WebRTCManager extends EventEmitter {
@@ -103,7 +103,7 @@ export class WebRTCManager extends EventEmitter {
     }
   }
 
-  private async logElementSelection(userId: string, elementData: ElementData): Promise<void> {
+  private async logElementSelection(userId: string, elementData: TargetedElement): Promise<void> {
     // This would typically log to the database
     // For now, we'll just log to console
     console.log(`📊 Element selection logged for user ${userId}:`, {
@@ -158,7 +158,7 @@ export class WebRTCManager extends EventEmitter {
     return this.webrtcService.getConnectionsForUser(userId);
   }
 
-  public getCurrentElement(userId: string): ElementData | null {
+  public getCurrentElement(userId: string): TargetedElement | null {
     return this.webrtcService.getCurrentElement(userId);
   }
 

@@ -10,10 +10,9 @@ import type {
   AuthToken,
   AuthRequest,
   AuthResponse,
-  UserRole,
-  Permission,
   JWTConfig
 } from '@mcp-pointer/shared';
+import { UserRole, Permission } from '@mcp-pointer/shared';
 import {
   AuthRequestSchema,
   AuthResponseSchema,

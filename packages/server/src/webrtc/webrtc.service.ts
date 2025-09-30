@@ -8,8 +8,7 @@ import { EventEmitter } from 'events';
 import type { 
   WebRTCConfig, 
   WebRTCMessage, 
-  WebRTCMessageType,
-  ElementData,
+  TargetedElement,
   User
 } from '@mcp-pointer/shared';
 import { createAppError, ErrorCode } from '@mcp-pointer/shared';
@@ -20,7 +19,7 @@ export interface WebRTCConnection {
   socket: WebSocket;
   isAlive: boolean;
   lastPing: number;
-  currentElement?: ElementData;
+  currentElement?: TargetedElement;
 }
 
 export interface WebRTCEventData {
@@ -179,7 +178,7 @@ export class WebRTCService extends EventEmitter {
     this.sendMessage(connectionId, { type: 'pong', data: { timestamp: Date.now() } });
   }
 
-  private handleElementSelected(connectionId: string, elementData: ElementData): void {
+  private handleElementSelected(connectionId: string, elementData: TargetedElement): void {
     const connection = this.connections.get(connectionId);
     if (!connection) return;
 
@@ -206,7 +205,7 @@ export class WebRTCService extends EventEmitter {
     console.log(`🎯 Element selected by ${connection.userId}:`, elementData.selector);
   }
 
-  private handleElementHover(connectionId: string, elementData: Partial<ElementData>): void {
+  private handleElementHover(connectionId: string, elementData: Partial<TargetedElement>): void {
     const connection = this.connections.get(connectionId);
     if (!connection) return;
 
@@ -341,7 +340,7 @@ export class WebRTCService extends EventEmitter {
     );
   }
 
-  public getCurrentElement(userId: string): ElementData | null {
+  public getCurrentElement(userId: string): TargetedElement | null {
     const connections = this.getConnectionsForUser(userId);
     return connections[0]?.currentElement || null;
   }

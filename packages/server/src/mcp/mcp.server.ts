@@ -14,12 +14,12 @@ import {
   ImageContent,
   EmbeddedResource
 } from '@modelcontextprotocol/sdk/types.js';
-import type { ElementData, User } from '@mcp-pointer/shared';
+import type { TargetedElement, User } from '@mcp-pointer/shared';
 import { createAppError, ErrorCode } from '@mcp-pointer/shared';
 
 export interface MCPToolContext {
   userId: string;
-  currentElement?: ElementData;
+  currentElement?: TargetedElement;
   sessionId: string;
 }
 
@@ -243,13 +243,13 @@ export class MCPServer {
 - **Tag Name:** ${element.tagName}
 - **Selector:** \`${element.selector}\`
 - **ID:** ${element.id || 'None'}
-- **Classes:** ${element.classNames?.join(', ') || 'None'}
+- **Classes:** ${element.classes?.join(', ') || 'None'}
 - **Text Content:** ${element.innerText?.substring(0, 200) || 'None'}${element.innerText && element.innerText.length > 200 ? '...' : ''}
 
 ## Location
 - **URL:** ${element.url}
-- **Position:** X: ${element.boundingRect?.x}, Y: ${element.boundingRect?.y}
-- **Size:** Width: ${element.boundingRect?.width}px, Height: ${element.boundingRect?.height}px
+- **Position:** X: ${element.position?.x}, Y: ${element.position?.y}
+- **Size:** Width: ${element.position?.width}px, Height: ${element.position?.height}px
 
 ## Attributes
 ${Object.entries(element.attributes || {}).map(([key, value]) => `- **${key}:** ${value}`).join('\n') || 'None'}
@@ -257,26 +257,23 @@ ${Object.entries(element.attributes || {}).map(([key, value]) => `- **${key}:** 
 ## Accessibility
 ${includeAccessibility && element.accessibility ? `
 - **Role:** ${element.accessibility.role || 'None'}
-- **Label:** ${element.accessibility.label || 'None'}
-- **Description:** ${element.accessibility.description || 'None'}
-- **ARIA Attributes:** ${Object.entries(element.accessibility.ariaAttributes || {}).map(([key, value]) => `${key}="${value}"`).join(', ') || 'None'}
+- **Aria Label:** ${element.accessibility.ariaLabel || 'None'}
+- **Aria Described By:** ${element.accessibility.ariaDescribedBy || 'None'}
+- **Tab Index:** ${element.accessibility.tabIndex || 'None'}
+- **Focusable:** ${element.accessibility.isFocusable ? 'Yes' : 'No'}
+- **Visible:** ${element.accessibility.isVisible ? 'Yes' : 'No'}
 ` : ''}
 
-## React Information
-${includeReactInfo && element.reactInfo ? `
-- **Component Name:** ${element.reactInfo.componentName || 'Unknown'}
-- **Props:** ${JSON.stringify(element.reactInfo.props, null, 2)}
-- **State:** ${element.reactInfo.state ? JSON.stringify(element.reactInfo.state, null, 2) : 'None'}
-- **Source File:** ${element.reactInfo.sourceFile || 'Unknown'}
+## Component Information
+${includeReactInfo && element.componentInfo ? `
+- **Component Name:** ${element.componentInfo.name || 'Unknown'}
+- **Source File:** ${element.componentInfo.sourceFile || 'Unknown'}
 ` : ''}
 
 ## Styles
-${includeStyles && element.styles ? `
-### Computed Styles
-${Object.entries(element.styles.computed || {}).map(([key, value]) => `- **${key}:** ${value}`).join('\n') || 'None'}
-
-### CSS Classes
-${element.styles.classes?.map(cls => `- ${cls}`).join('\n') || 'None'}
+${includeStyles && element.cssProperties ? `
+### CSS Properties
+${Object.entries(element.cssProperties).map(([key, value]) => `- **${key}:** ${value}`).join('\n') || 'None'}
 ` : ''}
 
 ---
@@ -285,12 +282,11 @@ ${element.styles.classes?.map(cls => `- ${cls}`).join('\n') || 'None'}
       }
     ];
 
-    // Add screenshot if requested
-    if (includeScreenshot && element.screenshot) {
+    // Add screenshot if requested (screenshot functionality not implemented yet)
+    if (includeScreenshot) {
       content.push({
-        type: 'image',
-        data: element.screenshot,
-        mimeType: 'image/png'
+        type: 'text',
+        text: 'Screenshot functionality not yet implemented'
       });
     }
 
@@ -422,7 +418,7 @@ ${code}
     this.context = context;
   }
 
-  public updateCurrentElement(element: ElementData): void {
+  public updateCurrentElement(element: TargetedElement): void {
     if (this.context) {
       this.context.currentElement = element;
     }

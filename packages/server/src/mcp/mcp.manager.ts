@@ -4,7 +4,7 @@
  */
 
 import { MCPServer, type MCPToolContext } from './mcp.server.js';
-import type { AppConfig, ElementData, User } from '@mcp-pointer/shared';
+import type { AppConfig, TargetedElement, User } from '@mcp-pointer/shared';
 import { createAppError, ErrorCode } from '@mcp-pointer/shared';
 
 export class MCPManager {
@@ -62,7 +62,7 @@ export class MCPManager {
     return context;
   }
 
-  public updateElementForUser(userId: string, element: ElementData): void {
+  public updateElementForUser(userId: string, element: TargetedElement): void {
     // Find the context for this user
     const context = Array.from(this.activeContexts.values())
       .find(ctx => ctx.userId === userId);

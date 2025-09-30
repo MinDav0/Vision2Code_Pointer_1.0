@@ -5,7 +5,7 @@
 
 import { Hono } from 'hono';
 import type { Context } from 'hono';
-import type { ElementData, User } from '@mcp-pointer/shared';
+import type { TargetedElement, User } from '@mcp-pointer/shared';
 import { createAppError, ErrorCode } from '@mcp-pointer/shared';
 
 export class ElementsAPI {
@@ -24,18 +24,17 @@ export class ElementsAPI {
         const body = await c.req.json();
         
         // Validate element data
-        const elementData: ElementData = {
+        const elementData: TargetedElement = {
           id: body.id || `element_${Date.now()}`,
           selector: body.selector,
           tagName: body.tagName,
           innerText: body.innerText,
-          innerHTML: body.innerHTML,
           attributes: body.attributes || {},
-          classNames: body.classNames || [],
-          boundingRect: body.boundingRect,
-          styles: body.styles,
+          classes: body.classNames || [],
+          position: body.boundingRect,
+          cssProperties: body.styles,
           accessibility: body.accessibility,
-          reactInfo: body.reactInfo,
+          componentInfo: body.reactInfo,
           url: body.url,
           timestamp: Date.now()
         };
