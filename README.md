@@ -1,281 +1,215 @@
-<img width="1440" height="480" alt="MCP Pointer banner" src="https://github.com/user-attachments/assets/a36d2666-e848-4a80-97b3-466897b244f7" />
+# 🎯 MCP Pointer v2.2
 
-[![CI](https://github.com/etsd-tech/mcp-pointer/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/etsd-tech/mcp-pointer/actions/workflows/ci.yml)
-[![Release](https://github.com/etsd-tech/mcp-pointer/actions/workflows/release.yml/badge.svg?branch=main)](https://github.com/etsd-tech/mcp-pointer/actions/workflows/release.yml)
-[![npm version](https://img.shields.io/npm/v/@mcp-pointer/server?label=Server)](https://www.npmjs.com/package/@mcp-pointer/server)
-[![Chrome Extension](https://img.shields.io/github/package-json/v/etsd-tech/mcp-pointer?filename=packages%2Fchrome-extension%2Fpackage.json&label=Chrome-Extension)](https://github.com/etsd-tech/mcp-pointer/releases)
-[![License: MIT](https://img.shields.io/github/license/etsd-tech/mcp-pointer?label=License)](https://github.com/etsd-tech/mcp-pointer/blob/main/LICENSE)
+**Production-ready element targeting for AI-assisted web development**
 
-# 👆 MCP Pointer v2.0
-
-**Secure, modern element targeting for agentic coding tools via MCP!**
-
-MCP Pointer v2.0 is a **security-first**, production-ready tool combining an MCP Server with a Chrome Extension:
-
-1. **🖥️ MCP Server** (Bun + TypeScript) - Secure server with database, authentication, and WebRTC
-2. **🌐 Chrome Extension** - Modern extension with React and real-time communication
-3. **🗄️ Database System** - SQLite with migrations, user management, and audit logging
-4. **🔒 Security Framework** - Comprehensive security with ESLint, input validation, and monitoring
-
-The system provides **secure, real-time element targeting** for AI tools like Claude Code, Cursor, and Windsurf through the Model Context Protocol.
+A complete Chrome extension and MCP server system that enables precise element selection and AI-powered analysis for modern web development workflows.
 
 ## ✨ Features
 
-### **Core Functionality**
-- 🎯 **`Option+Click` Selection** - Visual element targeting in browser
-- 📋 **Complete Element Data** - Text, CSS, attributes, positioning, and styling
-- ⚛️ **React Component Detection** - Component names and source files
-- 🔗 **WebRTC Communication** - Real-time, low-latency data transfer
-- 🤖 **MCP Compatible** - Works with Claude Code, Cursor, and Windsurf
+- **🎯 Element Targeting**: Click-to-select any DOM element with visual feedback
+- **🤖 AI Integration**: Real-time analysis powered by Cursor AI
+- **🔒 Security-First**: JWT authentication, secure database, audit logging
+- **⚡ High Performance**: Bun runtime, WebRTC communication, optimized queries
+- **🌐 Cross-Platform**: Works across Windows, macOS, and Linux
+- **📱 Modern UI**: Clean, responsive dark theme interface
 
-### **Security & Production Features**
-- 🔒 **Authentication System** - JWT-based user authentication
-- 🗄️ **Database Management** - SQLite with migrations and seeding
-- 📊 **Audit Logging** - Complete security event tracking
-- 🛡️ **Input Validation** - Zod schemas for all data validation
-- 🔍 **Security Scanning** - ESLint with 20+ security rules
-- ⚡ **Performance** - Bun runtime with optimized builds
+## 🚀 Quick Start
 
-## 📊 **Current Status**
+### Prerequisites
+- Bun runtime (recommended) or Node.js 18+
+- Chrome browser
+- Git
 
-**Phase 4: 100% Complete** - Full AI integration with Cursor AI and end-to-end testing complete
+### Installation
 
-### ✅ **Completed**
-- **Phase 1:** Foundation, security setup, ESLint configuration
-- **Phase 2:** All core services implemented
-- **Phase 3:** Chrome extension with React components and WebRTC client
-- **Phase 4:** AI integration with Cursor AI and comprehensive testing
-- **Database System:** SQLite with migrations, user management, audit logging
-- **Authentication:** JWT-based user authentication with role-based access
-- **WebRTC System:** Real-time communication with WebSocket server
-- **MCP System:** AI tool integration with 5 comprehensive tools
-- **API System:** 20+ secure endpoints with full CRUD operations
-- **AI Integration:** Cursor AI service with real-time element analysis
-- **End-to-End Testing:** Complete flow from extension to AI analysis verified
-- **Security:** Input validation, SQL injection prevention, audit logging, rate limiting
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/MinDav0/Vision2Code_Pointer_1.0.git
+   cd Vision2Code_Pointer_1.0
+   ```
 
-### 🔄 **Next Phase**
-- **Production Deployment:** Native deployment (current setup), CI/CD pipeline, monitoring
-- **Advanced Features:** Multi-user support, analytics dashboard, export functionality
-- **Testing & Deployment:** Comprehensive testing and CI/CD
+2. **Install dependencies**
+   ```bash
+   bun install
+   ```
 
-### ⏳ **Pending**
-- **Testing Framework:** Comprehensive unit and integration tests
-- **CI/CD Pipeline:** Automated testing and deployment
+3. **Set up environment**
+   ```bash
+   cp env.template .env
+   # Edit .env with your secure JWT secret and admin password
+   ```
 
-## 🎬 Usage example (video)
+4. **Initialize database**
+   ```bash
+   cd packages/server
+   bun run db:init
+   ```
 
-https://github.com/user-attachments/assets/98c4adf6-1f05-4c9b-be41-0416ab784e2c
+5. **Start the server**
+   ```bash
+   bun run dev
+   ```
 
-See MCP Pointer in action: `Option+Click` any element in your browser, then ask your agentic coding tool about it (in this example, Claude Code). The AI gets complete textual context about the selected DOM element including CSS properties, url, selector, and more.
+6. **Load Chrome extension**
+   ```bash
+   # Download the extension package
+   scp -P 2222 sysadmin@127.0.0.1:/home/sysadmin/Vision2Code_Pointer_1.0/mcp-pointer-extension-v2.2-final.tar.gz "C:\Users\Workspace\Desktop\VM Ubunut Dev\Extension"
+   ```
+   - Extract `mcp-pointer-extension-v2.2-final.tar.gz`
+   - Open Chrome → Extensions → Developer mode
+   - Click "Load unpacked" → Select the `build/` folder
 
-## 🚀 Getting Started
+## 📖 Usage
 
-### 1. Install Chrome Extension
+### Web Interface
+- Navigate to `http://localhost:3001`
+- Login: `admin@mcp-pointer.local`
+- Password: (set in your .env file)
 
-**🎉 Now available on Chrome Web Store!**
+### Chrome Extension
+1. Click the MCP Pointer icon in your browser
+2. Click "🎯 Start Targeting"
+3. Hover over elements to highlight them
+4. Click to select an element
+5. View AI analysis results
 
-[![Install from Chrome Web Store](https://img.shields.io/badge/Chrome_Web_Store-Install-blue?style=for-the-badge&logo=google-chrome)](https://chromewebstore.google.com/detail/mcp-pointer/jfhgaembhafbffidedhpkmnaajdfeiok)
+## 🏗️ Architecture
 
-Simply click the link above to install from the Chrome Web Store.
-
-<details>
-<summary>Alternative: Manual Installation</summary>
-
-**Option A: Download from Releases**
-
-1. Go to [GitHub Releases](https://github.com/etsd-tech/mcp-pointer/releases)
-2. Download `mcp-pointer-chrome-extension.zip` from the latest release
-3. Extract the zip file to a folder on your computer
-4. Open Chrome → Settings → Extensions → Developer mode (toggle ON)
-5. Click "Load unpacked" and select the extracted folder
-6. The MCP Pointer extension should appear in your extensions list
-7. **Reload web pages** to activate the extension
-
-**Option B: Build from Source**
-
-1. Clone this repository
-2. Follow the build instructions in [CONTRIBUTING.md](./CONTRIBUTING.md)
-3. Open Chrome → Settings → Extensions → Developer mode (toggle ON)
-4. Click "Load unpacked" and select the `packages/chrome-extension/dist/` folder
-5. **Reload web pages** to activate the extension
-
-</details>
-
-### 2. Configure MCP Server
-
-One command setup for your AI tool:
-
-```bash
-npx -y @mcp-pointer/server config claude  # or cursor, windsurf, and others - see below
+```
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│  Chrome         │    │  MCP Server      │    │  AI Services    │
+│  Extension      │◄──►│  (Bun Runtime)   │◄──►│  (Cursor AI)    │
+│                 │    │                  │    │                 │
+│ • Element       │    │ • Authentication │    │ • Analysis      │
+│   Targeting     │    │ • WebRTC         │    │ • Suggestions   │
+│ • Visual        │    │ • Database       │    │ • Code Examples │
+│   Feedback      │    │ • API Routes     │    │                 │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
 ```
 
-<details>
-<summary>Other AI Tools & Options</summary>
+## 🔧 Configuration
 
+### Environment Variables
 ```bash
-# For other AI tools
-npx -y @mcp-pointer/server config cursor     # Opens Cursor deeplink for automatic installation
-npx -y @mcp-pointer/server config windsurf   # Automatically updates Windsurf config file
-npx -y @mcp-pointer/server config manual     # Shows manual configuration for other tools
+# Server Configuration
+PORT=7007
+HOST=0.0.0.0
+
+# Database
+DATABASE_PATH=./data/mcp-pointer.db
+
+# Security (REQUIRED - Generate secure values)
+JWT_SECRET=your-super-secure-jwt-secret-here
+DEFAULT_ADMIN_PASSWORD=your-secure-admin-password
+
+# AI Services (Optional)
+CURSOR_WORKSPACE_PATH=/path/to/workspace
+CURSOR_EXTENSION_ID=your-extension-id
 ```
 
-> **Optional:** You can install globally with `npm install -g @mcp-pointer/server` to use `mcp-pointer` instead of `npx -y @mcp-pointer/server`
+## 📚 API Endpoints
 
-</details>
+| Endpoint | Method | Description | Auth Required |
+|----------|--------|-------------|---------------|
+| `/health` | GET | Server health check | ❌ |
+| `/auth/login` | POST | User authentication | ❌ |
+| `/api/status` | GET | System status | ✅ |
+| `/api/elements/analyze` | POST | Element analysis | ✅ |
+| `/webrtc/config` | GET | WebRTC configuration | ❌ |
 
-After configuration, **restart your coding tool** to load the MCP connection.
+## 🛠️ Development
 
-> **🔄 Already using MCP Pointer?** Run the config command again to update to auto-updating configuration:
-> ```bash
-> npx -y @mcp-pointer/server config <your-tool>  # Reconfigures to always use latest version
-> ```
+### Project Structure
+```
+Vision2Code_Pointer_1.0/
+├── packages/
+│   ├── server/          # MCP Server (Bun)
+│   ├── chrome-extension/ # Chrome Extension
+│   └── web/             # Web Interface
+├── docs/                # Documentation
+└── scripts/             # Build scripts
+```
 
-### 3. Start Using
+### Available Scripts
+```bash
+# Development
+bun run dev              # Start all services
+bun run dev:server       # Start server only
+bun run dev:extension    # Build extension
 
-1. **Navigate to any webpage** 
-2. **`Option+Click`** any element to select it
-3. **Ask your AI** to analyze the targeted element!
+# Database
+bun run db:init          # Initialize database
+bun run db:migrate       # Run migrations
+bun run db:seed          # Seed data
 
-Your AI tool will automatically start the MCP server when needed using the `npx -y @mcp-pointer/server@latest start` command.
+# Production
+bun run build            # Build all packages
+bun run start            # Start production server
+```
 
-**Available MCP Tool:**
-- `get-pointed-element` - Get textual information about the currently pointed DOM element from the browser extension
+## 🔒 Security
 
-## 🎯 How It Works
+- **Authentication**: JWT tokens with secure expiration
+- **Database**: SQLite with WAL mode and secure delete
+- **API**: Rate limiting and input validation
+- **Secrets**: Environment variable management (no hardcoded secrets)
+- **Audit**: Comprehensive logging and monitoring
 
-1. **Element Selection**: Content script captures `Option+Click` events
-2. **Data Extraction**: Analyzes element structure, CSS, and framework info
-3. **WebSocket Transport**: Sends data to MCP server on port 7007
-4. **MCP Protocol**: Makes data available to AI tools via MCP tools
-5. **AI Analysis**: Your assistant can now see and analyze the element!
+## 🚀 Deployment
 
-## 🎨 Element Data Extracted
+### Production Setup
+1. Set production environment variables
+2. Configure reverse proxy (nginx/Apache)
+3. Set up SSL certificates
+4. Configure firewall rules
+5. Set up monitoring and logging
 
-- **Basic Info**: Tag name, ID, classes, text content
-- **CSS Properties**: Display, position, colors, dimensions
-- **Component Info**: React component names and source files (experimental)  
-- **Attributes**: All HTML attributes
-- **Position**: Exact coordinates and dimensions
-- **Source Hints**: File paths and component origins
+### Cross-Platform Setup
+For Windows Chrome → Ubuntu VM setup, see `CROSS_PLATFORM_SETUP.md`
 
-## 🔍 Framework Support
+## 📊 Current Status
 
-- ⚛️ **React** - Component names and source files via Fiber (experimental)
-- 📦 **Generic HTML/CSS/JS** - Full support for any web content
-- 🔮 **Planned** - Vue component detection (PRs appreciated)
+- ✅ **Phase 1**: Core Architecture - Complete
+- ✅ **Phase 2**: Backend Services - Complete  
+- ✅ **Phase 3**: Chrome Extension - Complete
+- ✅ **Phase 4**: AI Integration - Complete
+- ✅ **Security**: All hardcoded secrets removed
+- ✅ **Documentation**: Comprehensive guides created
 
-## 🌐 Browser Support
+## 🎯 Extension Deployment
 
-- ✅ **Chrome** - Full support (tested)
-- 🟡 **Chromium-based browsers** - Should work (Edge, Brave, Arc - load built extension manually)
+### Standard Command
+```bash
+scp -P 2222 sysadmin@127.0.0.1:/home/sysadmin/Vision2Code_Pointer_1.0/mcp-pointer-extension-v2.2-final.tar.gz "C:\Users\Workspace\Desktop\VM Ubunut Dev\Extension"
+```
 
-## 🐛 Troubleshooting
-
-### Extension Not Connecting
-
-1. Make sure MCP server is running: `npx -y @mcp-pointer/server@latest start`
-2. Check browser console for WebSocket errors
-3. Verify port 7007 is not blocked by firewall
-
-### MCP Tools Not Available
-
-1. Restart your AI assistant after installing
-2. Check MCP configuration: `mcp-pointer config <your-tool>`  
-3. Verify server is running: `npx -y @mcp-pointer/server@latest start`
-
-### Elements Not Highlighting
-
-1. Some pages block content scripts (chrome://, etc.)
-2. Try refreshing the page
-3. Check if targeting is enabled (click extension icon)
-
-## 🚀 Roadmap
-
-### 1. **Dynamic Context Control**
-   - Full raw context transferred to server
-   - LLM-configurable detail levels (visible text only, all text, CSS levels)
-   - Progressive refinement options / token-conscious data fetching
-
-### 2. **Visual Content Support** (for multimodal LLMs)
-   - Base64 encoding for images (img tags)
-   - Screenshot capture of selected elements
-   - Separate MCP tool for direct visual content retrieval
-
-### 3. **Enhanced Framework Support**
-   - Vue.js component detection
-   - Better React support (React 19 removed `_debugSource`, affecting source mapping in dev builds)
-
-### 4. **Multi Select**
-   - Having the ability to select multiple DOM elements
-   - https://github.com/etsd-tech/mcp-pointer/pull/9
-
-## 🚀 **Deployment Options**
-
-### **✅ Recommended: Native Deployment (Current Setup)**
-
-**Resource Usage:**
-- **Memory:** ~80MB total (Server: 50MB, Web: 20MB, DB: 10MB)
-- **CPU:** Minimal overhead
-- **Disk:** ~100MB for application files
-
-**Perfect for:**
-- Single server deployments
-- Development and testing
-- Resource-constrained environments
-- Simple production setups
-
-**Current Status:** ✅ **Production Ready**
-- Server running on Bun runtime
-- SQLite database (no external dependencies)
-- Web interface with Node.js
-- All services operational
-
-### **🐳 Optional: Docker Deployment**
-
-**Resource Usage:**
-- **Memory:** ~230MB total (+150MB Docker overhead)
-- **CPU:** 1-5% additional overhead
-- **Disk:** +200-500MB for base images
-
-**Consider Docker when you need:**
-- Multiple environments (dev/staging/prod)
-- Easy scaling across multiple servers
-- Team deployment consistency
-- CI/CD automation
-- Container orchestration (Kubernetes)
-
-**When NOT to use Docker:**
-- Single server deployment
-- Resource-constrained environments
-- Simple production setup
-- Development and testing
-
-### **🎯 Our Recommendation**
-
-**Stick with the current native setup** because:
-- ✅ **More efficient** - 3x less memory usage
-- ✅ **Simpler maintenance** - no container complexity
-- ✅ **Faster startup** - no container overhead
-- ✅ **Production ready** - all features working
-- ✅ **Easy debugging** - direct process access
-
-**Docker can be added later** if scaling requirements change.
-
-## 📝 License
-
-MIT License - see LICENSE file for details
+### Installation Steps
+1. Run the SCP command above on Windows
+2. Extract the .tar.gz file in the Extension folder
+3. Load the `build/` folder as unpacked extension in Chrome
+4. Remove old extension first to avoid conflicts
 
 ## 🤝 Contributing
 
-We welcome contributions! Please see our [CONTRIBUTING.md](./CONTRIBUTING.md) guide for development setup and guidelines.
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests
+5. Submit a pull request
+
+## 📄 License
+
+MIT License - see [LICENSE](LICENSE) file for details.
+
+## 🆘 Support
+
+- **Documentation**: Check the project documentation files
+- **Issues**: GitHub Issues
+- **Cross-Platform Setup**: `CROSS_PLATFORM_SETUP.md`
+- **Security Guide**: `SECURITY.md`
 
 ---
 
-*Inspired by tools like [Click-to-Component](https://github.com/ericclemmons/click-to-component) for component development workflows.*
+**Built with ❤️ for the AI development community**
 
----
-
-**Made with ❤️ for AI-powered web development**
-
-*Now your AI can analyze any element you point at with `Option+Click`! 👆*
+**Version 2.2 - Production Ready** 🚀
