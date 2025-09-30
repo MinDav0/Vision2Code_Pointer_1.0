@@ -1,0 +1,173 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+@theme {
+  /* Light Mode - Background Colors */
+  --color-l-bg-1: #ffffff;
+  --color-l-bg-2: #f6f8fa;
+  --color-l-bg-3: #f1f3f4;
+  --color-l-bg-hover: #e1e4e8;
+
+  /* Light Mode - Text Colors */
+  --color-l-text-1: #24292f;
+  --color-l-text-2: #656d76;
+  --color-l-text-3: #8b949e;
+  --color-l-text-inv: #ffffff;
+
+  /* Dark Mode - Background Colors */
+  --color-d-bg-1: #0d1117;
+  --color-d-bg-2: #161b22;
+  --color-d-bg-3: #21262d;
+  --color-d-bg-hover: #30363d;
+
+  /* Dark Mode - Text Colors */
+  --color-d-text-1: #f0f6fc;
+  --color-d-text-2: #8b949e;
+  --color-d-text-3: #6e7681;
+  --color-d-text-inv: #24292f;
+
+  /* Accent Colors */
+  --color-accent-1: #0969da;
+  --color-accent-2: #0550ae;
+  --color-accent-success: #1a7f37;
+  --color-accent-warning: #9a6700;
+  --color-accent-danger: #cf222e;
+
+  /* Border Colors */
+  --color-border-l: #d0d7de;
+  --color-border-d: #30363d;
+
+  /* Shadow Colors */
+  --color-shadow-l: rgba(31, 35, 40, 0.04);
+  --color-shadow-d: rgba(0, 0, 0, 0.3);
+}
+
+/* Global Styles */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background-color: var(--color-l-bg-1);
+  color: var(--color-l-text-1);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+body.dark {
+  background-color: var(--color-d-bg-1);
+  color: var(--color-d-text-1);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-l-bg-2);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-l);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-l-text-3);
+}
+
+body.dark ::-webkit-scrollbar-track {
+  background: var(--color-d-bg-2);
+}
+
+body.dark ::-webkit-scrollbar-thumb {
+  background: var(--color-border-d);
+}
+
+body.dark ::-webkit-scrollbar-thumb:hover {
+  background: var(--color-d-text-3);
+}
+
+/* Focus styles */
+:focus-visible {
+  outline: 2px solid var(--color-accent-1);
+  outline-offset: 2px;
+}
+
+/* Selection styles */
+::selection {
+  background-color: var(--color-accent-1);
+  color: var(--color-l-text-inv);
+}
+
+body.dark ::selection {
+  background-color: var(--color-accent-1);
+  color: var(--color-d-text-inv);
+}
+
+/* Utility classes */
+.glass-effect {
+  backdrop-filter: blur(10px);
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+body.dark .glass-effect {
+  background-color: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, var(--color-accent-1), var(--color-accent-2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.card-shadow {
+  box-shadow: 0 1px 3px var(--color-shadow-l), 0 1px 2px var(--color-shadow-l);
+}
+
+body.dark .card-shadow {
+  box-shadow: 0 1px 3px var(--color-shadow-d), 0 1px 2px var(--color-shadow-d);
+}
+
+/* Animation classes */
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.slide-up {
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

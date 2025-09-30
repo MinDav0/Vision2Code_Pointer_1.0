@@ -10,6 +10,7 @@
     "dev:extension": "cd packages/chrome-extension && bun run dev",
     "dev:server": "cd packages/server && bun run dev",
     "dev:web": "cd packages/web && bun run dev",
+    "dev:frontend": "cd packages/frontend && bun run dev",
     "build": "bun run build:*",
     "build:extension": "cd packages/chrome-extension && bun run build",
     "build:server": "cd packages/server && bun run build",

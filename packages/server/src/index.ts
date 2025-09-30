@@ -544,7 +544,7 @@ const defaultConfig: AppConfig = {
     webrtcPort: 7008,
     host: '0.0.0.0', // Bind to all interfaces for external access
     cors: {
-      origin: ['http://localhost:3000', 'http://localhost:3001', 'http://10.0.2.15:3001', 'chrome-extension://*'],
+      origin: ['http://localhost:3000', 'http://localhost:3001', 'http://10.0.2.15:3001', 'http://10.0.2.15:3002', 'chrome-extension://*'],
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
