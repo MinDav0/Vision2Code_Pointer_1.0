@@ -61,11 +61,11 @@ MCP Pointer v2.2 is a complete, production-ready element targeting system for AI
 - **Security:** All secrets secured
 
 ### **Extension Package**
-- **Current Version:** `mcp-pointer-extension-v2.2-final.tar.gz`
+- **Current Version:** `mcp-pointer-extension-v2.2-fresh.tar.gz`
 - **Size:** 44,526 bytes
 - **Deployment Command:** 
   ```bash
-  scp -P 2222 sysadmin@127.0.0.1:/home/sysadmin/Vision2Code_Pointer_1.0/mcp-pointer-extension-v2.2-final.tar.gz "C:\Users\Workspace\Desktop\VM Ubunut Dev\Extension"
+  scp -P 2222 sysadmin@127.0.0.1:/home/sysadmin/Vision2Code_Pointer_1.0/mcp-pointer-extension-v2.2-fresh.tar.gz "C:\Users\Workspace\Desktop\VM Ubunut Dev\Extension"
   ```
 
 ## 🎯 **Testing Status**

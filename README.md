@@ -52,12 +52,16 @@ A complete Chrome extension and MCP server system that enables precise element s
 
 6. **Load Chrome extension**
    ```bash
-   # Download the extension package
-   scp -P 2222 sysadmin@127.0.0.1:/home/sysadmin/Vision2Code_Pointer_1.0/mcp-pointer-extension-v2.2-final.tar.gz "C:\Users\Workspace\Desktop\VM Ubunut Dev\Extension"
+   # Download the extension package (requires VirtualBox port forwarding)
+   scp -P 2222 sysadmin@127.0.0.1:/home/sysadmin/Vision2Code_Pointer_1.0/mcp-pointer-extension-v2.2-fresh.tar.gz "C:\Users\Workspace\Desktop\VM Ubunut Dev\Extension"
    ```
-   - Extract `mcp-pointer-extension-v2.2-final.tar.gz`
+   - Extract `mcp-pointer-extension-v2.2-fresh.tar.gz`
    - Open Chrome → Extensions → Developer mode
    - Click "Load unpacked" → Select the `build/` folder
+
+   **Note:** This command requires VirtualBox port forwarding configured:
+   - SSH: Host Port 2222 → Guest Port 22
+   - See `CROSS_PLATFORM_SETUP.md` for complete VirtualBox configuration
 
 ## 📖 Usage
 
@@ -180,14 +184,16 @@ For Windows Chrome → Ubuntu VM setup, see `CROSS_PLATFORM_SETUP.md`
 
 ### Standard Command
 ```bash
-scp -P 2222 sysadmin@127.0.0.1:/home/sysadmin/Vision2Code_Pointer_1.0/mcp-pointer-extension-v2.2-final.tar.gz "C:\Users\Workspace\Desktop\VM Ubunut Dev\Extension"
+scp -P 2222 sysadmin@127.0.0.1:/home/sysadmin/Vision2Code_Pointer_1.0/mcp-pointer-extension-v2.2-fresh.tar.gz "C:\Users\Workspace\Desktop\VM Ubunut Dev\Extension"
 ```
 
 ### Installation Steps
 1. Run the SCP command above on Windows
 2. Extract the .tar.gz file in the Extension folder
-3. Load the `build/` folder as unpacked extension in Chrome
-4. Remove old extension first to avoid conflicts
+3. **Remove old extension first** to avoid conflicts and caching issues
+4. Load the `build/` folder as unpacked extension in Chrome
+
+**⚠️ Important:** Always remove the old extension before loading a new version to prevent Chrome caching issues that can cause connection problems.
 
 ## 🤝 Contributing
 

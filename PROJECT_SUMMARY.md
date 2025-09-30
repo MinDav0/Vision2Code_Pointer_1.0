@@ -93,15 +93,24 @@ Element Selection → Database → Analysis Results
 ## 🌐 **Cross-Platform Support**
 
 ### **Tested Configuration**
-- **Server:** Ubuntu VM
+- **Server:** Ubuntu VM (VirtualBox)
 - **Client:** Windows 11 Chrome
-- **Network:** Port forwarding (2222, 7007, 7008, 3001)
+- **Network:** VirtualBox port forwarding configured
 - **Connectivity:** Full bidirectional communication
+
+### **VirtualBox Port Forwarding Rules**
+| Service | Host Port | Guest Port | Protocol |
+|---------|-----------|------------|----------|
+| SSH | 2222 | 22 | TCP |
+| API Server | 7007 | 7007 | TCP |
+| WebRTC | 7008 | 7008 | TCP |
+| Web Interface | 3001 | 3001 | TCP |
+| NextJS (legacy) | 3000 | 3000 | TCP |
 
 ### **Deployment Process**
 ```bash
 # Standard deployment command
-scp -P 2222 sysadmin@127.0.0.1:/home/sysadmin/Vision2Code_Pointer_1.0/mcp-pointer-extension-v2.2-final.tar.gz "C:\Users\Workspace\Desktop\VM Ubunut Dev\Extension"
+scp -P 2222 sysadmin@127.0.0.1:/home/sysadmin/Vision2Code_Pointer_1.0/mcp-pointer-extension-v2.2-fresh.tar.gz "C:\Users\Workspace\Desktop\VM Ubunut Dev\Extension"
 ```
 
 ## 🎯 **Current Capabilities**
