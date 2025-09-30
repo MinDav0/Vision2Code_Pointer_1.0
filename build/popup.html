@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCP Pointer</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            width: 360px;
+            min-height: 420px;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a1a;
+            color: #ffffff;
+            position: relative;
+            cursor: move;
+            user-select: none;
+        }
+        
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(147, 51, 234, 0.05) 100%);
+            pointer-events: none;
+        }
+        
+        .drag-handle {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: move;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.6);
+            z-index: 10;
+        }
+        
+        .content {
+            margin-top: 32px;
+            padding: 20px;
+            position: relative;
+            z-index: 5;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+        
+        .header p {
+            margin: 6px 0 0 0;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 400;
+        }
+        
+        .status {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .status-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .status-label {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 500;
+        }
+        
+        .status-value {
+            font-size: 13px;
+            font-weight: 600;
+        }
+        
+        .status-connected {
+            color: #10b981;
+        }
+        
+        .status-disconnected {
+            color: #ef4444;
+        }
+        
+        .element-info {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid rgba(0, 200, 255, 0.4);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            font-size: 11px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .element-info::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #00ff88, #00c8ff, #ff00c8);
+            animation: gradientShift 2s ease-in-out infinite;
+        }
+        
+        .element-info h4 {
+            margin: 0 0 10px 0;
+            color: #00ff88;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .element-info p {
+            margin: 6px 0;
+            color: #00c8ff;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .element-info strong {
+            color: #ffffff;
+            font-weight: 500;
+        }
+        
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .btn {
+            padding: 12px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        .info {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            font-size: 12px;
+            opacity: 0.8;
+            backdrop-filter: blur(10px);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .info {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(0, 200, 255, 0.2);
+            border-radius: 6px;
+            padding: 12px;
+            margin-top: 15px;
+            font-size: 10px;
+            color: #00c8ff;
+            font-family: 'JetBrains Mono', monospace;
+            line-height: 1.4;
+        }
+        
+        .info strong {
+            color: #00ff88;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="drag-handle">MCP Pointer v2.0 - Drag to move</div>
+    <div class="content">
+        <div class="header">
+            <h1>MCP Pointer</h1>
+            <p>Element targeting for AI tools</p>
+        </div>
+    
+    <div class="status">
+        <div class="status-item">
+            <span class="status-label">Server Status:</span>
+            <span class="status-value" id="serverStatus">Checking...</span>
+        </div>
+        <div class="status-item">
+            <span class="status-label">WebRTC:</span>
+            <span class="status-value" id="webrtcStatus">Checking...</span>
+        </div>
+        <div class="status-item">
+            <span class="status-label">Targeting:</span>
+            <span class="status-value" id="targetingStatus">Ready</span>
+        </div>
+    </div>
+    
+    <div class="controls">
+        <button class="btn btn-primary" id="startTargeting">🎯 Start Targeting</button>
+        <button class="btn btn-danger hidden" id="stopTargeting">⏹️ Stop Targeting</button>
+        <button class="btn btn-secondary" id="checkServer">🔄 Check Server</button>
+        <button class="btn btn-secondary" id="openSettings">⚙️ Settings</button>
+    </div>
+    
+        <div class="info">
+            <strong>Instructions:</strong><br>
+            1. Click "Start Targeting" to begin<br>
+            2. Hover over elements to highlight<br>
+            3. Click to select an element<br>
+            4. Element info will be sent to MCP server
+        </div>
+    </div>
+    
+    <script src="popup.js"></script>
+</body>
+</html>
