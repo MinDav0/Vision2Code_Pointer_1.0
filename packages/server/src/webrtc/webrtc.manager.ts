@@ -5,7 +5,7 @@
 
 import { EventEmitter } from 'events';
 import { WebRTCService, type WebRTCConnection, type WebRTCEventData } from './webrtc.service.js';
-import type { AppConfig, TargetedElement, User } from '@mcp-pointer/shared';
+import type { AppConfig, TargetedElement } from '@mcp-pointer/shared';
 import { createAppError, ErrorCode } from '@mcp-pointer/shared';
 
 export class WebRTCManager extends EventEmitter {
@@ -48,7 +48,7 @@ export class WebRTCManager extends EventEmitter {
 
   private async handleElementSelected(eventData: WebRTCEventData): Promise<void> {
     try {
-      const { connectionId, userId, data: elementData } = eventData;
+      const { connectionId: _connectionId, userId, data: elementData } = eventData;
       
       console.log(`🎯 Element selected by user ${userId}:`, {
         selector: elementData.selector,
@@ -75,7 +75,7 @@ export class WebRTCManager extends EventEmitter {
 
   private async handleElementHover(eventData: WebRTCEventData): Promise<void> {
     try {
-      const { connectionId, userId, data: elementData } = eventData;
+      const { connectionId: _connectionId, userId, data: elementData } = eventData;
       
       // Handle element hover (less critical than selection)
       // Could be used for preview functionality
@@ -88,9 +88,9 @@ export class WebRTCManager extends EventEmitter {
 
   private async handleConnectionClosed(eventData: WebRTCEventData): Promise<void> {
     try {
-      const { connectionId, userId } = eventData;
+      const { connectionId: _connectionId, userId } = eventData;
       
-      console.log(`🔌 Connection closed for user ${userId}: ${connectionId}`);
+      console.log(`🔌 Connection closed for user ${userId}: ${_connectionId}`);
       
       // Clean up any user-specific state
       await this.cleanupUserState(userId);
@@ -123,7 +123,7 @@ export class WebRTCManager extends EventEmitter {
 
   public async start(): Promise<void> {
     if (this.isStarted) {
-      throw createAppError(ErrorCode.INTERNAL_ERROR, 'WebRTC manager already started');
+      throw createAppError(ErrorCode.INTERNAL_SERVER_ERROR, 'WebRTC manager already started');
     }
 
     try {
@@ -132,7 +132,7 @@ export class WebRTCManager extends EventEmitter {
       console.log('✅ WebRTC service started successfully');
     } catch (error) {
       this.isStarted = false;
-      throw createAppError(ErrorCode.INTERNAL_ERROR, `Failed to start WebRTC service: ${error}`);
+      throw createAppError(ErrorCode.INTERNAL_SERVER_ERROR, `Failed to start WebRTC service: ${error}`);
     }
   }
 

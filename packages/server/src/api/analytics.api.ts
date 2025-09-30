@@ -6,7 +6,7 @@
 import { Hono } from 'hono';
 import type { Context } from 'hono';
 import type { User } from '@mcp-pointer/shared';
-import { createAppError, ErrorCode } from '@mcp-pointer/shared';
+import { createAppError, ErrorCode, UserRole } from '@mcp-pointer/shared';
 
 export class AnalyticsAPI {
   private app: Hono;
@@ -20,7 +20,7 @@ export class AnalyticsAPI {
     // Get dashboard metrics
     this.app.get('/dashboard', async (c: Context) => {
       try {
-        const user = c.get('user') as User;
+        const _user = c.get('user') as Partial<User>;
         const period = c.req.query('period') || '7d';
         
         // Here you would typically get metrics from database
@@ -80,7 +80,7 @@ export class AnalyticsAPI {
     // Get usage analytics
     this.app.get('/usage', async (c: Context) => {
       try {
-        const user = c.get('user') as User;
+        const _user = c.get('user') as Partial<User>;
         const startDate = c.req.query('startDate');
         const endDate = c.req.query('endDate');
         const granularity = c.req.query('granularity') || 'day'; // hour, day, week, month
@@ -115,7 +115,7 @@ export class AnalyticsAPI {
     // Get performance metrics
     this.app.get('/performance', async (c: Context) => {
       try {
-        const user = c.get('user') as User;
+        const _user = c.get('user') as Partial<User>;
         const period = c.req.query('period') || '24h';
         
         // Here you would typically get performance data from database
@@ -172,10 +172,10 @@ export class AnalyticsAPI {
     // Get user activity
     this.app.get('/users/activity', async (c: Context) => {
       try {
-        const user = c.get('user') as User;
+        const _user = c.get('user') as Partial<User>;
         
-        if (user.role !== 'admin') {
-          throw createAppError(ErrorCode.UNAUTHORIZED_ACCESS, 'Admin access required', 403);
+        if (_user.role !== UserRole.ADMIN) {
+          throw createAppError(ErrorCode.UNAUTHORIZED, 'Admin access required', 403);
         }
         
         const limit = parseInt(c.req.query('limit') || '20');
@@ -223,10 +223,10 @@ export class AnalyticsAPI {
     // Get system health
     this.app.get('/health', async (c: Context) => {
       try {
-        const user = c.get('user') as User;
+        const _user = c.get('user') as Partial<User>;
         
-        if (user.role !== 'admin') {
-          throw createAppError(ErrorCode.UNAUTHORIZED_ACCESS, 'Admin access required', 403);
+        if (_user.role !== UserRole.ADMIN) {
+          throw createAppError(ErrorCode.UNAUTHORIZED, 'Admin access required', 403);
         }
         
         // Here you would typically check system health
@@ -285,7 +285,7 @@ export class AnalyticsAPI {
     // Export analytics data
     this.app.get('/export', async (c: Context) => {
       try {
-        const user = c.get('user') as User;
+        const _user = c.get('user') as Partial<User>;
         const format = c.req.query('format') || 'json';
         const type = c.req.query('type') || 'usage'; // usage, performance, users
         const startDate = c.req.query('startDate');

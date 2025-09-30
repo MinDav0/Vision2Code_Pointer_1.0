@@ -5,18 +5,20 @@
 
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import { logger } from 'hono/logger';
-import { secureHeaders } from 'hono/secure-headers';
+// import { logger } from 'hono/logger';
+// import { secureHeaders } from 'hono/secure-headers';
 import type { AppConfig } from '@mcp-pointer/shared';
-import { createAppError, ErrorCode } from '@mcp-pointer/shared';
+import { createAppError, ErrorCode, UserRole } from '@mcp-pointer/shared';
 import { JWTAuthService } from './auth/jwt.service.js';
 import { AuthMiddleware } from './middleware/auth.middleware.js';
 import { WebRTCManager } from './webrtc/webrtc.manager.js';
 import { MCPManager } from './mcp/mcp.manager.js';
 import { createRateLimiter } from './middleware/rate-limiter.middleware.js';
+import { getAIConfig, validateAIConfig, getAIConfigSummary } from './config/ai.config.js';
 import { UsersAPI } from './api/users.api.js';
 import { ElementsAPI } from './api/elements.api.js';
 import { AnalyticsAPI } from './api/analytics.api.js';
+import { AIManager } from './ai/ai.manager.js';
 
 export class MCPServer {
   private app: Hono;
@@ -27,6 +29,7 @@ export class MCPServer {
   private usersAPI: UsersAPI;
   private elementsAPI: ElementsAPI;
   private analyticsAPI: AnalyticsAPI;
+  private aiManager: AIManager;
   private config: AppConfig;
 
   constructor(config: AppConfig) {
@@ -35,9 +38,22 @@ export class MCPServer {
     this.authService = new JWTAuthService(config.security.jwt);
     this.authMiddleware = new AuthMiddleware(this.authService);
     this.webrtcManager = new WebRTCManager(config);
-    this.mcpManager = new MCPManager(config);
+    
+    // Initialize AI configuration
+    const aiConfig = getAIConfig();
+    const warnings = validateAIConfig(aiConfig);
+    
+    if (warnings.length > 0) {
+      console.log('AI Configuration Warnings:');
+      warnings.forEach(warning => console.log(`⚠️ ${warning}`));
+    }
+    
+    console.log(getAIConfigSummary(aiConfig));
+    
+    this.mcpManager = new MCPManager(config, aiConfig);
+    this.aiManager = new AIManager(aiConfig);
     this.usersAPI = new UsersAPI();
-    this.elementsAPI = new ElementsAPI();
+    this.elementsAPI = new ElementsAPI(this.aiManager);
     this.analyticsAPI = new AnalyticsAPI();
     
     this.setupMiddleware();
@@ -55,10 +71,10 @@ export class MCPServer {
     
     // CORS configuration
     this.app.use('*', cors({
-      origin: this.config.server.cors.origin,
+      origin: [...this.config.server.cors.origin],
       credentials: this.config.server.cors.credentials,
-      allowMethods: this.config.server.cors.methods,
-      allowHeaders: this.config.server.cors.allowedHeaders
+      allowMethods: [...this.config.server.cors.methods],
+      allowHeaders: [...this.config.server.cors.allowedHeaders]
     }));
 
     // Rate limiting
@@ -72,6 +88,7 @@ export class MCPServer {
           throw createAppError(ErrorCode.INVALID_INPUT, 'Request too large', 413);
         }
         await next();
+        return;
       } catch (error) {
         c.status(413);
         return c.json({ error: 'Request too large' });
@@ -173,7 +190,7 @@ export class MCPServer {
     api.route('/analytics', this.analyticsAPI.getApp());
 
     // Configuration endpoint (admin only)
-    api.get('/config', this.authMiddleware.requireRole('admin'), async (c) => {
+    api.get('/config', this.authMiddleware.requireRole(UserRole.ADMIN), async (c) => {
       return c.json({
         // Return safe configuration (no secrets)
         webrtc: {
@@ -497,6 +514,15 @@ export class MCPServer {
       console.error('Failed to start MCP service:', error);
       throw error;
     }
+
+    // Initialize AI Manager
+    try {
+      await this.aiManager.initialize();
+      console.log('🤖 AI Manager initialized and ready for analysis');
+    } catch (error) {
+      console.error('Failed to initialize AI Manager:', error);
+      throw error;
+    }
     
     // Start HTTP server
     Bun.serve({
@@ -516,9 +542,9 @@ const defaultConfig: AppConfig = {
   server: {
     port: 7007,
     webrtcPort: 7008,
-    host: 'localhost',
+    host: '0.0.0.0', // Bind to all interfaces for external access
     cors: {
-      origin: ['http://localhost:3000', 'chrome-extension://*'],
+      origin: ['http://localhost:3000', 'http://localhost:3001', 'http://10.0.2.15:3001', 'chrome-extension://*'],
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
@@ -532,7 +558,9 @@ const defaultConfig: AppConfig = {
   },
   security: {
     jwt: {
-      secret: process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-this-in-production',
+      secret: process.env.JWT_SECRET || (() => {
+        throw new Error('JWT_SECRET environment variable is required. Please set it in your .env file.');
+      })(),
       expiresIn: '15m',
       refreshExpiresIn: '7d',
       algorithm: 'HS256'
@@ -603,7 +631,7 @@ const defaultConfig: AppConfig = {
 };
 
 // Start server if this file is run directly
-if (import.meta.main) {
+if (Bun.main === import.meta.url) {
   const server = new MCPServer(defaultConfig);
   await server.start();
 }

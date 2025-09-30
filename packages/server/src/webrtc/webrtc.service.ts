@@ -8,10 +8,9 @@ import { EventEmitter } from 'events';
 import type { 
   WebRTCConfig, 
   WebRTCMessage, 
-  TargetedElement,
-  User
+  TargetedElement
 } from '@mcp-pointer/shared';
-import { createAppError, ErrorCode } from '@mcp-pointer/shared';
+import { generateUUID } from '@mcp-pointer/shared';
 
 export interface WebRTCConnection {
   id: string;
@@ -73,8 +72,10 @@ export class WebRTCService extends EventEmitter {
       
       // Send connection confirmation
       this.sendMessage(connectionId, {
-        type: 'connection_established',
-        data: { connectionId, iceServers: this.config.iceServers }
+        type: 'element-data',
+        payload: { type: 'connection_established', connectionId, iceServers: this.config.iceServers },
+        timestamp: Date.now(),
+        messageId: generateUUID()
       });
 
       // Handle incoming messages
@@ -135,32 +136,16 @@ export class WebRTCService extends EventEmitter {
     console.log(`📨 WebRTC message from ${connectionId}:`, message.type);
 
     switch (message.type) {
-      case 'ping':
-        this.handlePing(connectionId);
+      case 'heartbeat':
+        this.handleHeartbeat(connectionId, message.payload);
         break;
       
-      case 'element_selected':
-        this.handleElementSelected(connectionId, message.data);
+      case 'element-data':
+        this.handleElementData(connectionId, message.payload);
         break;
       
-      case 'element_hover':
-        this.handleElementHover(connectionId, message.data);
-        break;
-      
-      case 'webrtc_offer':
-        this.handleWebRTCOffer(connectionId, message.data);
-        break;
-      
-      case 'webrtc_answer':
-        this.handleWebRTCAnswer(connectionId, message.data);
-        break;
-      
-      case 'webrtc_ice_candidate':
-        this.handleWebRTCIceCandidate(connectionId, message.data);
-        break;
-      
-      case 'request_element_data':
-        this.handleElementDataRequest(connectionId, message.data);
+      case 'error':
+        this.handleError(connectionId, message.payload);
         break;
       
       default:
@@ -169,40 +154,60 @@ export class WebRTCService extends EventEmitter {
     }
   }
 
-  private handlePing(connectionId: string): void {
+  private handleHeartbeat(connectionId: string, _payload: unknown): void {
     const connection = this.connections.get(connectionId);
     if (connection) {
       connection.isAlive = true;
       connection.lastPing = Date.now();
     }
-    this.sendMessage(connectionId, { type: 'pong', data: { timestamp: Date.now() } });
+    this.sendMessage(connectionId, { 
+      type: 'heartbeat', 
+      payload: { timestamp: Date.now() },
+      timestamp: Date.now(),
+      messageId: generateUUID()
+    });
   }
 
-  private handleElementSelected(connectionId: string, elementData: TargetedElement): void {
+  private handleElementData(connectionId: string, payload: unknown): void {
     const connection = this.connections.get(connectionId);
     if (!connection) return;
 
-    // Update current element for this connection
-    connection.currentElement = elementData;
+    // Handle different types of element data
+    if (payload && typeof payload === 'object' && 'type' in payload) {
+      const data = payload as any;
+      
+      if (data.type === 'element_selected' && data.element) {
+        // Update current element for this connection
+        connection.currentElement = data.element;
 
-    // Emit event for other services to handle
-    this.emit('element_selected', {
-      connectionId,
-      userId: connection.userId,
-      data: elementData,
-      timestamp: Date.now()
-    });
+        // Emit event for other services to handle
+        this.emit('element_selected', {
+          connectionId,
+          userId: connection.userId,
+          data: data.element,
+          timestamp: Date.now()
+        });
 
-    // Send confirmation
-    this.sendMessage(connectionId, {
-      type: 'element_selected_confirmed',
-      data: { 
-        elementId: elementData.id,
-        timestamp: Date.now()
+        // Send confirmation
+        this.sendMessage(connectionId, {
+          type: 'element-data',
+          payload: { 
+            type: 'element_selected_confirmed',
+            elementId: data.element.id,
+            timestamp: Date.now()
+          },
+          timestamp: Date.now(),
+          messageId: generateUUID()
+        });
+      } else if (data.type === 'element_hover' && data.element) {
+        this.handleElementHover(connectionId, data.element);
       }
-    });
+    }
+  }
 
-    console.log(`🎯 Element selected by ${connection.userId}:`, elementData.selector);
+  private handleError(connectionId: string, payload: unknown): void {
+    console.error(`WebRTC error from ${connectionId}:`, payload);
+    // Handle error appropriately
   }
 
   private handleElementHover(connectionId: string, elementData: Partial<TargetedElement>): void {
@@ -216,56 +221,6 @@ export class WebRTCService extends EventEmitter {
       data: elementData,
       timestamp: Date.now()
     });
-  }
-
-  private handleWebRTCOffer(connectionId: string, offerData: any): void {
-    // Handle WebRTC offer from client
-    console.log(`📡 WebRTC offer from ${connectionId}`);
-    
-    // In a real implementation, you would process the offer and create an answer
-    // For now, we'll just acknowledge it
-    this.sendMessage(connectionId, {
-      type: 'webrtc_offer_received',
-      data: { offerId: offerData.id }
-    });
-  }
-
-  private handleWebRTCAnswer(connectionId: string, answerData: any): void {
-    // Handle WebRTC answer from client
-    console.log(`📡 WebRTC answer from ${connectionId}`);
-    
-    this.sendMessage(connectionId, {
-      type: 'webrtc_answer_received',
-      data: { answerId: answerData.id }
-    });
-  }
-
-  private handleWebRTCIceCandidate(connectionId: string, candidateData: any): void {
-    // Handle ICE candidate from client
-    console.log(`🧊 ICE candidate from ${connectionId}`);
-    
-    this.sendMessage(connectionId, {
-      type: 'ice_candidate_received',
-      data: { candidateId: candidateData.id }
-    });
-  }
-
-  private handleElementDataRequest(connectionId: string, requestData: any): void {
-    const connection = this.connections.get(connectionId);
-    if (!connection) return;
-
-    // Return current element data if available
-    if (connection.currentElement) {
-      this.sendMessage(connectionId, {
-        type: 'element_data_response',
-        data: {
-          element: connection.currentElement,
-          timestamp: Date.now()
-        }
-      });
-    } else {
-      this.sendError(connectionId, 'No element currently selected');
-    }
   }
 
   private handleDisconnection(connectionId: string): void {
@@ -318,7 +273,9 @@ export class WebRTCService extends EventEmitter {
   public sendError(connectionId: string, error: string): void {
     this.sendMessage(connectionId, {
       type: 'error',
-      data: { error, timestamp: Date.now() }
+      payload: { error, timestamp: Date.now() },
+      timestamp: Date.now(),
+      messageId: generateUUID()
     });
   }
 

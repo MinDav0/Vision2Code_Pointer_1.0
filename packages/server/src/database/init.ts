@@ -279,3 +279,46 @@ export class DatabaseInitializer {
 // Export database initializer instance
 export const dbInitializer = new DatabaseInitializer();
 
+// Main function for CLI usage
+async function main() {
+  const args = process.argv.slice(2);
+  const command = args[0];
+
+  try {
+    switch (command) {
+      case '--reset':
+        await dbInitializer.initialize({ resetDatabase: true });
+        break;
+      case '--backup':
+        await dbInitializer.initialize({ runMigrations: false, seedData: false });
+        const backupPath = `./backups/backup-${Date.now()}.db`;
+        await dbInitializer.backup(backupPath);
+        console.log(`✅ Backup created at: ${backupPath}`);
+        break;
+      case '--status':
+        await dbInitializer.initialize({ runMigrations: false, seedData: false });
+        await dbInitializer.checkStatus();
+        break;
+      case '--health':
+        await dbInitializer.initialize({ runMigrations: false, seedData: false });
+        await dbInitializer.verifyIntegrity();
+        break;
+      default:
+        // Default: full initialization
+        await dbInitializer.initialize();
+        break;
+    }
+    
+    await dbInitializer.close();
+    console.log('🎉 Database initialization completed successfully!');
+  } catch (error) {
+    console.error('❌ Database initialization failed:', error);
+    process.exit(1);
+  }
+}
+
+// Run main function if this file is executed directly
+if (import.meta.main) {
+  main();
+}
+

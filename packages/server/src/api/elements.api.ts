@@ -7,12 +7,15 @@ import { Hono } from 'hono';
 import type { Context } from 'hono';
 import type { TargetedElement, User } from '@mcp-pointer/shared';
 import { createAppError, ErrorCode } from '@mcp-pointer/shared';
+import type { AIManager } from '../ai/ai.manager.js';
 
 export class ElementsAPI {
   private app: Hono;
+  private aiManager?: AIManager;
 
-  constructor() {
+  constructor(aiManager?: AIManager) {
     this.app = new Hono();
+    this.aiManager = aiManager;
     this.setupRoutes();
   }
 
@@ -20,7 +23,7 @@ export class ElementsAPI {
     // Detect element (from browser extension)
     this.app.post('/detect', async (c: Context) => {
       try {
-        const user = c.get('user') as User;
+        const _user = c.get('user') as Partial<User>;
         const body = await c.req.json();
         
         // Validate element data
@@ -61,7 +64,7 @@ export class ElementsAPI {
     // Get element history for user
     this.app.get('/history', async (c: Context) => {
       try {
-        const user = c.get('user') as User;
+        const _user = c.get('user') as Partial<User>;
         const limit = parseInt(c.req.query('limit') || '10');
         const offset = parseInt(c.req.query('offset') || '0');
         
@@ -74,7 +77,7 @@ export class ElementsAPI {
           innerText: `Example element ${i + 1}`,
           url: 'https://example.com',
           timestamp: Date.now() - (i * 60000), // 1 minute apart
-          detectedBy: user.id
+          detectedBy: _user.id
         }));
         
         return c.json({
@@ -99,59 +102,100 @@ export class ElementsAPI {
     // Analyze element
     this.app.post('/analyze', async (c: Context) => {
       try {
-        const user = c.get('user') as User;
+        const _user = c.get('user') as Partial<User>;
         const body = await c.req.json();
         
-        const { elementId, analysisType = 'comprehensive' } = body;
+        const { elementId, analysisType = 'comprehensive', element } = body;
         
-        if (!elementId) {
-          throw createAppError(ErrorCode.INVALID_INPUT, 'Element ID is required', 400);
+        if (!elementId && !element) {
+          throw createAppError(ErrorCode.INVALID_INPUT, 'Element ID or element data is required', 400);
         }
         
-        // Here you would typically:
-        // 1. Get element data from database
-        // 2. Perform analysis based on type
-        // 3. Return analysis results
-        
-        const analysis = {
-          elementId,
-          analysisType,
-          results: {
-            accessibility: {
-              score: 85,
-              issues: [
-                'Missing alt text on image',
-                'Low color contrast ratio'
-              ],
-              recommendations: [
-                'Add descriptive alt text',
-                'Increase color contrast to meet WCAG standards'
-              ]
-            },
-            performance: {
-              score: 92,
-              issues: [],
-              recommendations: [
-                'Element is well optimized'
-              ]
-            },
-            seo: {
-              score: 78,
-              issues: [
-                'Missing meta description'
-              ],
-              recommendations: [
-                'Add relevant meta description'
-              ]
-            }
-          },
+        // Use provided element data or create a mock element for testing
+        const elementData: TargetedElement = element || {
+          id: elementId || 'test-element',
+          tagName: 'DIV',
+          selector: '#test-element',
+          xpath: '//div[@id="test-element"]',
+          textContent: 'Test element for analysis',
+          className: 'test-class',
+          innerText: 'Test element content',
+          attributes: { id: elementId || 'test-element', class: 'test-class' },
+          classes: ['test-class'],
+          position: { x: 100, y: 100, width: 200, height: 50 },
+          cssProperties: { color: '#000000', fontSize: '14px' },
+          accessibility: { role: 'button', ariaLabel: 'Test button' },
+          componentInfo: null,
+          url: 'https://example.com',
           timestamp: Date.now()
         };
         
-        return c.json({
-          success: true,
-          analysis
-        });
+        // Use AI Manager for real analysis if available
+        if (this.aiManager) {
+          const aiResponse = await this.aiManager.analyzeElement({
+            element: elementData,
+            analysisType: analysisType as 'accessibility' | 'performance' | 'semantics' | 'usability' | 'comprehensive',
+            includeSuggestions: true,
+            includeCodeExamples: true,
+            context: `Analysis request for element ${elementId || elementData.id}`
+          });
+          
+          return c.json({
+            success: true,
+            analysis: {
+              elementId: elementData.id,
+              analysisType,
+              aiAnalysis: aiResponse.analysis,
+              suggestions: aiResponse.suggestions,
+              codeExamples: aiResponse.codeExamples,
+              confidence: aiResponse.confidence,
+              source: aiResponse.source,
+              metadata: aiResponse.metadata,
+              timestamp: Date.now()
+            }
+          });
+        } else {
+          // Fallback to mock analysis if AI Manager not available
+          const analysis = {
+            elementId: elementData.id,
+            analysisType,
+            results: {
+              accessibility: {
+                score: 85,
+                issues: [
+                  'Missing alt text on image',
+                  'Low color contrast ratio'
+                ],
+                recommendations: [
+                  'Add descriptive alt text',
+                  'Increase color contrast to meet WCAG standards'
+                ]
+              },
+              performance: {
+                score: 92,
+                issues: [],
+                recommendations: [
+                  'Element is well optimized'
+                ]
+              },
+              seo: {
+                score: 78,
+                issues: [
+                  'Missing meta description'
+                ],
+                recommendations: [
+                  'Add relevant meta description'
+                ]
+              }
+            },
+            timestamp: Date.now()
+          };
+          
+          return c.json({
+            success: true,
+            analysis
+          });
+        }
       } catch (error) {
         const status = error instanceof Error && 'statusCode' in error 
           ? (error as any).statusCode 
@@ -168,7 +212,7 @@ export class ElementsAPI {
     // Get element statistics
     this.app.get('/stats', async (c: Context) => {
       try {
-        const user = c.get('user') as User;
+        const _user = c.get('user') as Partial<User>;
         const period = c.req.query('period') || '7d'; // 7 days, 30d, 90d, 1y
         
         // Here you would typically get statistics from database
@@ -213,10 +257,10 @@ export class ElementsAPI {
     // Export element data
     this.app.get('/export', async (c: Context) => {
       try {
-        const user = c.get('user') as User;
+        const _user = c.get('user') as Partial<User>;
         const format = c.req.query('format') || 'json'; // json, csv, xlsx
-        const startDate = c.req.query('startDate');
-        const endDate = c.req.query('endDate');
+        const _startDate = c.req.query('startDate');
+        const _endDate = c.req.query('endDate');
         
         // Here you would typically:
         // 1. Get elements from database based on date range
@@ -231,7 +275,7 @@ export class ElementsAPI {
             innerText: 'Example element 1',
             url: 'https://example.com',
             timestamp: Date.now(),
-            detectedBy: user.id
+            detectedBy: _user.id
           }
         ];
         
@@ -262,7 +306,7 @@ export class ElementsAPI {
     // Search elements
     this.app.get('/search', async (c: Context) => {
       try {
-        const user = c.get('user') as User;
+        const _user = c.get('user') as Partial<User>;
         const query = c.req.query('q');
         const limit = parseInt(c.req.query('limit') || '10');
         

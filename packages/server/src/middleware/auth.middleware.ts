@@ -4,19 +4,15 @@
  */
 
 import type { Context, Next } from 'hono';
-import type { Permission, UserRole } from '@mcp-pointer/shared';
+import type { Permission, User } from '@mcp-pointer/shared';
+import { UserRole } from '@mcp-pointer/shared';
 import { JWTAuthService } from '../auth/jwt.service.js';
 import { createAppError, ErrorCode } from '@mcp-pointer/shared';
 
 // Extend Hono context with user information
 declare module 'hono' {
   interface ContextVariableMap {
-    user: {
-      id: string;
-      email: string;
-      role: UserRole;
-      permissions: Permission[];
-    };
+    user: Partial<User>;
     authService: JWTAuthService;
   }
 }

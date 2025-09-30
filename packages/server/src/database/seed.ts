@@ -5,7 +5,8 @@
 
 import bcrypt from 'bcryptjs';
 import { DatabaseConnection } from './connection.js';
-import type { User, UserRole, Permission } from '@mcp-pointer/shared';
+// import type { Permission } from '@mcp-pointer/shared';
+import { UserRole } from '@mcp-pointer/shared';
 import { createAppError, ErrorCode, generateUUID } from '@mcp-pointer/shared';
 
 export interface SeedData {
@@ -247,7 +248,7 @@ export class DatabaseSeeder {
     email: string,
     name: string,
     password: string,
-    role: UserRole = 'viewer'
+    role: UserRole = UserRole.VIEWER
   ): Promise<string> {
     try {
       // Check if user already exists

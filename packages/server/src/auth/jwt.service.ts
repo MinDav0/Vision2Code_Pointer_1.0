@@ -91,19 +91,23 @@ export class JWTAuthService {
       permissions: user.permissions
     };
 
-    const accessToken = jwt.sign(payload, this.config.secret, {
-      expiresIn: this.config.expiresIn,
-      algorithm: this.config.algorithm,
-      issuer: 'mcp-pointer',
-      audience: 'mcp-pointer-client'
-    });
+    const accessToken = jwt.sign(
+      payload as object, 
+      this.config.secret, 
+      {
+        expiresIn: this.config.expiresIn,
+        algorithm: this.config.algorithm as jwt.Algorithm,
+        issuer: 'mcp-pointer',
+        audience: 'mcp-pointer-client'
+      }
+    );
 
     const refreshToken = jwt.sign(
-      { userId: user.id, type: 'refresh' },
+      { userId: user.id, type: 'refresh' } as object,
       this.config.secret,
       {
         expiresIn: this.config.refreshExpiresIn,
-        algorithm: this.config.algorithm,
+        algorithm: this.config.algorithm as jwt.Algorithm,
         issuer: 'mcp-pointer',
         audience: 'mcp-pointer-client'
       }
@@ -256,22 +260,45 @@ export class JWTAuthService {
   // Private helper methods
 
   private async findUserByEmail(email: string): Promise<UserWithPassword | null> {
-    // This would typically query a database
-    // For now, return a mock user for demonstration
-    if (email === 'admin@yourcompany.com') {
+    try {
+      // Import database connection
+      const { DatabaseConnection } = await import('../database/connection.js');
+      const db = DatabaseConnection.getInstance();
+      
+      // Ensure database is connected
+      await db.connect();
+      
+      // Query user from database
+      const users = await db.executeQuery<{
+        id: string;
+        email: string;
+        name: string;
+        password_hash: string;
+        role: string;
+        created_at: string;
+        updated_at: string;
+      }>('SELECT id, email, name, password_hash, role, created_at, updated_at FROM users WHERE email = ?', [email]);
+      
+      if (users.length === 0) {
+        return null;
+      }
+      
+      const user = users[0];
       return {
-        id: '123e4567-e89b-12d3-a456-426614174000',
-        email: 'admin@yourcompany.com',
-        name: 'Admin User',
-        role: UserRole.ADMIN,
-        permissions: this.getRolePermissions(UserRole.ADMIN),
-        createdAt: new Date('2024-01-01'),
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role as UserRole,
+        permissions: this.getRolePermissions(user.role as UserRole),
+        createdAt: new Date(user.created_at),
         lastLoginAt: undefined,
         isActive: true,
-        passwordHash: await this.hashPassword('admin123!')
+        passwordHash: user.password_hash
       };
+    } catch (error) {
+      console.error('Database error in findUserByEmail:', error);
+      return null;
     }
-    return null;
   }
 
   private async findUserById(userId: string): Promise<User | null> {

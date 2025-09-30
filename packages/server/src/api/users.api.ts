@@ -5,7 +5,8 @@
 
 import { Hono } from 'hono';
 import type { Context } from 'hono';
-import type { User, UserRole } from '@mcp-pointer/shared';
+import type { User } from '@mcp-pointer/shared';
+import { UserRole } from '@mcp-pointer/shared';
 import { createAppError, ErrorCode } from '@mcp-pointer/shared';
 
 export class UsersAPI {
@@ -20,18 +21,18 @@ export class UsersAPI {
     // Get current user profile
     this.app.get('/profile', async (c: Context) => {
       try {
-        const user = c.get('user') as User;
+        const _user = c.get('user') as Partial<User>;
         
         return c.json({
           success: true,
           user: {
-            id: user.id,
-            email: user.email,
-            role: user.role,
-            permissions: user.permissions,
-            createdAt: user.createdAt,
-            lastLoginAt: user.lastLoginAt,
-            isActive: user.isActive
+            id: _user.id,
+            email: _user.email,
+            role: _user.role,
+            permissions: _user.permissions,
+            createdAt: _user.createdAt,
+            lastLoginAt: _user.lastLoginAt,
+            isActive: _user.isActive
           }
         });
       } catch (error) {
@@ -46,16 +47,16 @@ export class UsersAPI {
     // Update user profile
     this.app.put('/profile', async (c: Context) => {
       try {
-        const user = c.get('user') as User;
+        const _user = c.get('user') as Partial<User>;
         const body = await c.req.json();
         
         // Validate allowed fields
         const allowedFields = ['email', 'firstName', 'lastName'];
-        const updates: Partial<User> = {};
+        const updates: Record<string, any> = {};
         
         for (const field of allowedFields) {
           if (body[field] !== undefined) {
-            updates[field as keyof User] = body[field];
+            updates[field] = body[field];
           }
         }
         
@@ -65,7 +66,7 @@ export class UsersAPI {
           success: true,
           message: 'Profile updated successfully',
           user: {
-            ...user,
+            ..._user,
             ...updates,
             updatedAt: new Date().toISOString()
           }
@@ -82,7 +83,7 @@ export class UsersAPI {
     // Change password
     this.app.post('/change-password', async (c: Context) => {
       try {
-        const user = c.get('user') as User;
+        const _user = c.get('user') as Partial<User>;
         const body = await c.req.json();
         
         const { currentPassword, newPassword } = body;
@@ -120,7 +121,7 @@ export class UsersAPI {
     // Get user sessions
     this.app.get('/sessions', async (c: Context) => {
       try {
-        const user = c.get('user') as User;
+        const _user = c.get('user') as Partial<User>;
         
         // Here you would typically get active sessions from database
         // For now, we'll return a mock response
@@ -151,8 +152,8 @@ export class UsersAPI {
     // Revoke session
     this.app.delete('/sessions/:sessionId', async (c: Context) => {
       try {
-        const user = c.get('user') as User;
-        const sessionId = c.req.param('sessionId');
+        const _user = c.get('user') as Partial<User>;
+        const _sessionId = c.req.param('sessionId');
         
         // Here you would typically revoke the session in database
         // For now, we'll return a mock response
@@ -173,10 +174,10 @@ export class UsersAPI {
     // Admin: Get all users (admin only)
     this.app.get('/admin/users', async (c: Context) => {
       try {
-        const user = c.get('user') as User;
+        const _user = c.get('user') as Partial<User>;
         
-        if (user.role !== 'admin') {
-          throw createAppError(ErrorCode.UNAUTHORIZED_ACCESS, 'Admin access required', 403);
+        if (_user.role !== UserRole.ADMIN) {
+          throw createAppError(ErrorCode.UNAUTHORIZED, 'Admin access required', 403);
         }
         
         // Here you would typically get all users from database
@@ -221,16 +222,16 @@ export class UsersAPI {
     // Admin: Update user role
     this.app.put('/admin/users/:userId/role', async (c: Context) => {
       try {
-        const user = c.get('user') as User;
+        const _user = c.get('user') as Partial<User>;
         const userId = c.req.param('userId');
         const body = await c.req.json();
         
-        if (user.role !== 'admin') {
-          throw createAppError(ErrorCode.UNAUTHORIZED_ACCESS, 'Admin access required', 403);
+        if (_user.role !== UserRole.ADMIN) {
+          throw createAppError(ErrorCode.UNAUTHORIZED, 'Admin access required', 403);
         }
         
         const { role } = body;
-        const validRoles: UserRole[] = ['admin', 'user', 'viewer'];
+        const validRoles: UserRole[] = [UserRole.ADMIN, UserRole.DEVELOPER, UserRole.VIEWER];
         
         if (!validRoles.includes(role)) {
           throw createAppError(ErrorCode.INVALID_INPUT, 'Invalid role', 400);

@@ -4,23 +4,24 @@
  */
 
 import { MCPServer, type MCPToolContext } from './mcp.server.js';
-import type { AppConfig, TargetedElement, User } from '@mcp-pointer/shared';
+import type { AppConfig, TargetedElement } from '@mcp-pointer/shared';
 import { createAppError, ErrorCode } from '@mcp-pointer/shared';
+import type { AIConfig } from '../ai/ai.manager.js';
 
 export class MCPManager {
   private mcpServer: MCPServer;
-  private config: AppConfig;
+  // private config: AppConfig;
   private isStarted: boolean = false;
   private activeContexts: Map<string, MCPToolContext> = new Map();
 
-  constructor(config: AppConfig) {
-    this.config = config;
-    this.mcpServer = new MCPServer();
+  constructor(_config: AppConfig, aiConfig?: AIConfig) {
+    // this.config = config;
+    this.mcpServer = new MCPServer(aiConfig);
   }
 
   public async start(): Promise<void> {
     if (this.isStarted) {
-      throw createAppError(ErrorCode.INTERNAL_ERROR, 'MCP manager already started');
+      throw createAppError(ErrorCode.INTERNAL_SERVER_ERROR, 'MCP manager already started');
     }
 
     try {
@@ -29,7 +30,7 @@ export class MCPManager {
       console.log('✅ MCP Manager started successfully');
     } catch (error) {
       this.isStarted = false;
-      throw createAppError(ErrorCode.INTERNAL_ERROR, `Failed to start MCP manager: ${error}`);
+      throw createAppError(ErrorCode.INTERNAL_SERVER_ERROR, `Failed to start MCP manager: ${error}`);
     }
   }
 

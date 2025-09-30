@@ -7,7 +7,7 @@
 
 import { Command } from 'commander';
 import { MCPServer } from './index.js';
-import type { AppConfig } from '@your-company/pointer-shared';
+import type { AppConfig } from '@mcp-pointer/shared';
 
 const program = new Command();
 
@@ -28,14 +28,26 @@ program
     try {
       console.log('🚀 Starting MCP Pointer Server v2.0...');
       
-      const config = await loadConfig(options.config);
+      const baseConfig = await loadConfig(options.config);
       
-      // Override config with CLI options
-      if (options.port) config.server.port = parseInt(options.port, 10);
-      if (options.host) config.server.host = options.host;
+      // Create mutable copy and override with CLI options
+      const config = {
+        ...baseConfig,
+        server: {
+          ...baseConfig.server,
+          port: options.port ? parseInt(options.port, 10) : baseConfig.server.port,
+          host: options.host || baseConfig.server.host
+        },
+        monitoring: {
+          ...baseConfig.monitoring,
+          logging: {
+            ...baseConfig.monitoring.logging,
+            level: options.dev ? 'debug' : baseConfig.monitoring.logging.level
+          }
+        }
+      };
       
       if (options.dev) {
-        config.monitoring.logging.level = 'debug';
         console.log('🔧 Development mode enabled');
       }
       
@@ -61,7 +73,7 @@ program
         await generateConfigFile();
         console.log('✅ Configuration file generated: config.json');
       } else if (options.validate) {
-        const config = await loadConfig();
+        await loadConfig();
         console.log('✅ Configuration is valid');
       } else if (options.show) {
         const config = await loadConfig();

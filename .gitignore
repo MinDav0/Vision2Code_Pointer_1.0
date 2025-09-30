@@ -6,8 +6,39 @@ dist/
 # TypeScript
 *.tsbuildinfo
 
-# Test files
+# Environment and Secrets
+.env
+.env.local
+.env.production
+.env.development
+*.key
+*.pem
+*.p12
+*.pfx
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+data/
+logs/
+
+# Test files with secrets
 packages/server/src/__tests__/tmp/
+packages/server/test-*.ts
+packages/server/test-*.js
 
 # Release artifacts
 mcp-pointer-chrome-extension.zip
+mcp-pointer-extension*.tar.gz
+
+# IDE and OS files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+tmp/
+temp/

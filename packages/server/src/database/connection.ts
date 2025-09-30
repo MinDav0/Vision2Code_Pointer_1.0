@@ -3,7 +3,7 @@
  * SQLite with security-first design and connection pooling
  */
 
-import Database from 'better-sqlite3';
+import { Database } from 'bun:sqlite';
 import path from 'path';
 import fs from 'fs';
 import type { AppError } from '@mcp-pointer/shared';
@@ -11,9 +11,9 @@ import { createAppError, ErrorCode, sanitizeString } from '@mcp-pointer/shared';
 
 export class DatabaseConnection {
   private static instance: DatabaseConnection;
-  private db: Database.Database | null = null;
+  private db: Database | null = null;
   private readonly dbPath: string;
-  private readonly maxConnections: number = 1; // SQLite is single-threaded
+  // private readonly maxConnections: number = 1; // SQLite is single-threaded
 
   private constructor(dbPath: string) {
     // Validate and sanitize database path
@@ -51,19 +51,18 @@ export class DatabaseConnection {
 
       // Initialize database with security settings
       this.db = new Database(this.dbPath, {
-        verbose: process.env.NODE_ENV === 'development' ? console.log : undefined,
-        timeout: 5000, // 5 second timeout
-        readonly: false,
-        fileMustExist: false
+        create: true,
+        readwrite: true,
+        strict: true
       });
 
       // Enable security features
-      this.db.pragma('journal_mode = WAL'); // Write-Ahead Logging
-      this.db.pragma('synchronous = FULL'); // Full synchronization
-      this.db.pragma('cache_size = 1000'); // Cache size
-      this.db.pragma('temp_store = MEMORY'); // Store temp tables in memory
-      this.db.pragma('foreign_keys = ON'); // Enable foreign key constraints
-      this.db.pragma('secure_delete = ON'); // Secure delete (overwrite deleted data)
+      this.db.exec('PRAGMA journal_mode = WAL'); // Write-Ahead Logging
+      this.db.exec('PRAGMA synchronous = FULL'); // Full synchronization
+      this.db.exec('PRAGMA cache_size = 1000'); // Cache size
+      this.db.exec('PRAGMA temp_store = MEMORY'); // Store temp tables in memory
+      this.db.exec('PRAGMA foreign_keys = ON'); // Enable foreign key constraints
+      this.db.exec('PRAGMA secure_delete = ON'); // Secure delete (overwrite deleted data)
 
       // Set up prepared statements for security
       this.setupPreparedStatements();
@@ -77,7 +76,7 @@ export class DatabaseConnection {
     }
   }
 
-  public getDatabase(): Database.Database {
+  public getDatabase(): Database {
     if (!this.db) {
       throw createAppError(
         ErrorCode.DATABASE_ERROR,
@@ -122,7 +121,7 @@ export class DatabaseConnection {
       // Sanitize parameters
       const sanitizedParams = params.map(param => this.sanitizeParameter(param));
       
-      const stmt = this.db.prepare(query);
+      const stmt = this.db.query(query);
       const result = stmt.all(...sanitizedParams) as T[];
       
       return result;
@@ -154,12 +153,12 @@ export class DatabaseConnection {
       // Sanitize parameters
       const sanitizedParams = params.map(param => this.sanitizeParameter(param));
       
-      const stmt = this.db.prepare(query);
-      const result = stmt.run(...sanitizedParams);
+      const stmt = this.db.query(query);
+      stmt.run(...sanitizedParams);
       
       return {
-        changes: result.changes,
-        lastInsertRowid: result.lastInsertRowid
+        changes: this.db.changes,
+        lastInsertRowid: Number(this.db.lastInsertRowID)
       };
     } catch (error) {
       throw createAppError(
@@ -171,7 +170,7 @@ export class DatabaseConnection {
   }
 
   public async executeTransaction<T>(
-    operations: (db: Database.Database) => T
+    operations: (db: Database) => T
   ): Promise<T> {
     if (!this.db) {
       throw createAppError(
@@ -182,7 +181,17 @@ export class DatabaseConnection {
     }
 
     try {
-      return this.db.transaction(operations)();
+      // Bun SQLite doesn't have a transaction method like better-sqlite3
+      // We'll use BEGIN/COMMIT manually
+      this.db.exec('BEGIN');
+      try {
+        const result = operations(this.db);
+        this.db.exec('COMMIT');
+        return result;
+      } catch (error) {
+        this.db.exec('ROLLBACK');
+        throw error;
+      }
     } catch (error) {
       throw createAppError(
         ErrorCode.DATABASE_ERROR,
@@ -268,8 +277,9 @@ export class DatabaseConnection {
         fs.mkdirSync(backupDir, { recursive: true, mode: 0o700 });
       }
 
-      // Create backup
-      this.db.backup(resolvedBackupPath);
+      // Create backup - Bun SQLite doesn't have a backup method
+      // We'll use the VACUUM INTO command instead
+      this.db.exec(`VACUUM INTO '${resolvedBackupPath}'`);
     } catch (error) {
       throw createAppError(
         ErrorCode.DATABASE_ERROR,
@@ -294,15 +304,15 @@ export class DatabaseConnection {
     }
 
     try {
-      const stats = this.db.pragma('page_count') as [{ page_count: number }];
-      const pageSize = this.db.pragma('page_size') as [{ page_size: number }];
-      const freelist = this.db.pragma('freelist_count') as [{ freelist_count: number }];
+      const stats = this.db.query('PRAGMA page_count').get() as { page_count: number };
+      const pageSize = this.db.query('PRAGMA page_size').get() as { page_size: number };
+      const freelist = this.db.query('PRAGMA freelist_count').get() as { freelist_count: number };
 
       return {
-        size: stats[0]?.page_count * pageSize[0]?.page_size ?? 0,
-        pageCount: stats[0]?.page_count ?? 0,
-        pageSize: pageSize[0]?.page_size ?? 0,
-        freelistCount: freelist[0]?.freelist_count ?? 0
+        size: stats?.page_count * pageSize?.page_size ?? 0,
+        pageCount: stats?.page_count ?? 0,
+        pageSize: pageSize?.page_size ?? 0,
+        freelistCount: freelist?.freelist_count ?? 0
       };
     } catch (error) {
       throw createAppError(

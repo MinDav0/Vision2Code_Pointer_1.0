@@ -197,7 +197,7 @@ export class MigrationManager {
         applied_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         checksum TEXT NOT NULL,
         
-        CONSTRAINT version_format CHECK (version LIKE '%.%.%'),
+        CONSTRAINT version_format CHECK (version LIKE '%T%' OR version LIKE '%.%.%'),
         CONSTRAINT name_not_empty CHECK (LENGTH(name) > 0)
       );
     `;
@@ -255,8 +255,8 @@ export class MigrationManager {
       const name = match[2].replace(/_/g, ' ');
 
       // Parse migration content
-      const upMatch = content.match(/-- UP Migration\s*\n(.*?)(?=\n-- DOWN Migration|\n-- |$)/s);
-      const downMatch = content.match(/-- DOWN Migration.*?\n(.*?)(?=\n-- |$)/s);
+      const upMatch = content.match(/-- UP Migration\s*\n(.*?)(?=\n-- DOWN Migration|$)/s);
+      const downMatch = content.match(/-- DOWN Migration\s*\n(.*?)(?=$)/s);
 
       const up = upMatch ? upMatch[1].trim() : '';
       const down = downMatch ? downMatch[1].trim() : '';
@@ -286,31 +286,27 @@ export class MigrationManager {
         return;
       }
 
-      // Execute migration in transaction
-      await this.db.executeTransaction(async (db) => {
-        // Split SQL statements and execute them
-        const statements = migration.up
-          .split(';')
-          .map(stmt => stmt.trim())
-          .filter(stmt => stmt.length > 0);
+      // Execute the entire migration SQL as one statement
+      const db = this.db.getDatabase();
+      
+      // Execute migration SQL
+      db.exec(migration.up);
 
-        for (const statement of statements) {
-          if (statement.trim()) {
-            db.exec(statement);
-          }
-        }
-
-        // Record migration as applied
-        const insertSQL = `
-          INSERT INTO migrations (version, name, checksum)
-          VALUES (?, ?, ?)
-        `;
-        
-        db.prepare(insertSQL).run(migration.version, migration.name, migration.checksum);
-      });
+      // Record migration as applied
+      const insertSQL = `
+        INSERT INTO migrations (version, name, checksum)
+        VALUES (?, ?, ?)
+      `;
+      
+      db.query(insertSQL).run(migration.version, migration.name, migration.checksum);
 
       console.log(`✅ Applied migration: ${migration.version} - ${migration.name}`);
     } catch (error) {
+      console.error(`❌ Migration ${migration.version} failed:`, error);
+      if (error instanceof Error) {
+        console.error('Error message:', error.message);
+        console.error('Stack trace:', error.stack);
+      }
       throw createAppError(
         ErrorCode.DATABASE_ERROR,
         `Failed to apply migration ${migration.version}: ${error instanceof Error ? error.message : 'Unknown error'}`,
@@ -344,7 +340,7 @@ export class MigrationManager {
 
         // Remove migration record
         const deleteSQL = 'DELETE FROM migrations WHERE version = ?';
-        db.prepare(deleteSQL).run(migration.version);
+        db.query(deleteSQL).run(migration.version);
       });
 
       console.log(`✅ Rolled back migration: ${migration.version} - ${migration.name}`);

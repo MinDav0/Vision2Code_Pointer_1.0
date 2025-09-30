@@ -4,7 +4,8 @@
  */
 
 import bcrypt from 'bcryptjs';
-import type { User, UserRole, Permission } from '@mcp-pointer/shared';
+import type { User } from '@mcp-pointer/shared';
+import { UserRole, Permission } from '@mcp-pointer/shared';
 import { createAppError, ErrorCode, generateUUID, validateEmail } from '@mcp-pointer/shared';
 import { DatabaseConnection } from '../connection.js';
 
@@ -131,7 +132,6 @@ export class UserModel {
         role: row.role as UserRole,
         permissions: this.getRolePermissions(row.role as UserRole),
         createdAt: new Date(row.created_at),
-        updatedAt: new Date(row.updated_at),
         lastLoginAt: row.last_login_at ? new Date(row.last_login_at) : undefined,
         isActive: Boolean(row.is_active)
       };
@@ -170,7 +170,6 @@ export class UserModel {
         role: row.role as UserRole,
         permissions: this.getRolePermissions(row.role as UserRole),
         createdAt: new Date(row.created_at),
-        updatedAt: new Date(row.updated_at),
         lastLoginAt: row.last_login_at ? new Date(row.last_login_at) : undefined,
         isActive: Boolean(row.is_active)
       };
@@ -212,7 +211,6 @@ export class UserModel {
         role: row.role as UserRole,
         permissions: this.getRolePermissions(row.role as UserRole),
         createdAt: new Date(row.created_at),
-        updatedAt: new Date(row.updated_at),
         lastLoginAt: row.last_login_at ? new Date(row.last_login_at) : undefined,
         isActive: Boolean(row.is_active),
         passwordHash: row.password_hash
@@ -381,7 +379,6 @@ export class UserModel {
         role: row.role as UserRole,
         permissions: this.getRolePermissions(row.role as UserRole),
         createdAt: new Date(row.created_at),
-        updatedAt: new Date(row.updated_at),
         lastLoginAt: row.last_login_at ? new Date(row.last_login_at) : undefined,
         isActive: Boolean(row.is_active)
       }));
