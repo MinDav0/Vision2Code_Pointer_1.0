@@ -30,6 +30,7 @@ MCP Pointer v2.2 is a complete element targeting system for AI-assisted web deve
 14. FRONTEND_ACCESS_GUIDE.md - Frontend access and testing guide
 15. CONTRIBUTING.md - Development workflow and contribution guidelines
 16. DOCUMENTATION.md - Documentation structure and maintenance
+17. SOP_FRONTEND_ARCHITECTURE.md - MANDATORY frontend architecture standard
 
 ## CURRENT SYSTEM STATUS
 
@@ -68,12 +69,39 @@ MCP Pointer v2.2 is a complete element targeting system for AI-assisted web deve
 - Server: cd packages/server && bun run dev
 - Extension: Use pre-built v2.2-fresh package
 
+## FRONTEND ARCHITECTURE STANDARD
+**CRITICAL:** This project MUST use the template-react-ts approach for ALL frontend development.
+
+### MANDATORY FRONTEND STRUCTURE
+- **Main App:** Root-level React TypeScript app (not in packages/)
+- **Template:** https://github.com/YousifAbozid/template-react-ts
+- **Tech Stack:** React 19, TypeScript, Vite, Tailwind CSS v4
+- **Features:** Dark mode, theming system, ESLint/Prettier, Husky hooks
+
+### FORBIDDEN FRONTEND PATTERNS
+- ❌ Multiple frontend packages (frontend/, web/, extension/)
+- ❌ Simple Node.js servers for UI
+- ❌ Fragmented frontend architecture
+- ❌ Redundant UI packages
+
+### REQUIRED PACKAGES STRUCTURE
+```
+/
+├── src/                    # Main React app (template-react-ts)
+├── packages/
+│   ├── server/            # MCP Server only
+│   ├── chrome-extension/  # Browser extension only
+│   └── shared/            # Shared types/utils only
+└── [template configs]     # All template-react-ts files
+```
+
 ## AI EXECUTION PRIORITIES
 1. Read all listed files for complete context
-2. Understand VirtualBox setup and SSH workflow
-3. Know extension deployment process and caching issues
-4. Understand current system architecture and capabilities
-5. Be aware of known issues and workarounds
+2. **ENFORCE template-react-ts architecture for ALL frontend work**
+3. Understand VirtualBox setup and SSH workflow
+4. Know extension deployment process and caching issues
+5. Understand current system architecture and capabilities
+6. Be aware of known issues and workarounds
 
 ## PROJECT STATE
-Production-ready system with comprehensive documentation. All major features implemented and tested. Ready for real-world deployment and advanced feature development.
+Production-ready system with comprehensive documentation. **FRONTEND ARCHITECTURE NEEDS RESTRUCTURING** to follow template-react-ts standard. All major features implemented and tested. Ready for real-world deployment and advanced feature development.
