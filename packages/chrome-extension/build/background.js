@@ -13,8 +13,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'getServerConfig') {
     // Return server configuration
     sendResponse({
-      serverUrl: 'http://localhost:7007',
-      webrtcUrl: 'ws://localhost:7008'
+      serverUrl: 'http://127.0.0.1:7007',
+      webrtcUrl: 'ws://127.0.0.1:7008'
     });
   }
   
@@ -43,7 +43,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     chrome.storage.local.set({ lastSelectedElement: request.element });
     
     // Send to server (optional - for AI analysis)
-    fetch('http://localhost:7007/api/elements/analyze', {
+    fetch('http://127.0.0.1:7007/api/elements/analyze', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
