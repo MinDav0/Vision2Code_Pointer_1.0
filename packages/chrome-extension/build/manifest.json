@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "MCP Pointer v2.2 Fresh",
-  "description": "Point to browser DOM elements for agentic coding tools via MCP - Fresh Build",
-  "version": "2.2.1",
+  "name": "MCP Pointer v2.3",
+  "description": "Next-generation element targeting for AI-assisted web development with classic dark theme",
+  "version": "2.3.0",
   "permissions": [
     "activeTab",
     "storage",

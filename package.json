@@ -1,6 +1,6 @@
 {
   "name": "mcp-pointer-v2",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "Modern, secure MCP Pointer for AI-assisted web development with template-react-ts architecture",
   "private": true,
   "packageManager": "bun@1.0.0",
