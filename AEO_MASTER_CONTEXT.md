@@ -63,11 +63,20 @@ MCP Pointer v2.2 is a complete element targeting system for AI-assisted web deve
 - Chrome extension dev server crashes with Plasmo (use pre-built extension)
 - Main dev script fails (run components individually)
 - Extension caching requires "fresh" naming and old extension removal
+- Tailwind CSS v4 requires @tailwindcss/postcss plugin (not direct tailwindcss)
 
 ### WORKING COMMANDS
-- Frontend: cd packages/frontend && bun run dev
+- Frontend: bun run dev
 - Server: cd packages/server && bun run dev
 - Extension: Use pre-built v2.2-fresh package
+
+### REQUIRED VS CODE EXTENSIONS
+- Tailwind CSS IntelliSense (bradlc.vscode-tailwindcss)
+- ESLint (dbaeumer.vscode-eslint)
+- Prettier (esbenp.prettier-vscode)
+- TypeScript (ms-vscode.vscode-typescript-next)
+- Auto Rename Tag (formulahendry.auto-rename-tag)
+- Path Intellisense (christian-kohler.path-intellisense)
 
 ## FRONTEND ARCHITECTURE STANDARD
 **CRITICAL:** This project MUST use the template-react-ts approach for ALL frontend development.
@@ -104,4 +113,4 @@ MCP Pointer v2.2 is a complete element targeting system for AI-assisted web deve
 6. Be aware of known issues and workarounds
 
 ## PROJECT STATE
-Production-ready system with comprehensive documentation. **FRONTEND ARCHITECTURE NEEDS RESTRUCTURING** to follow template-react-ts standard. All major features implemented and tested. Ready for real-world deployment and advanced feature development.
+Production-ready system with comprehensive documentation. **FRONTEND ARCHITECTURE RESTRUCTURED ✅** to follow template-react-ts standard. All major features implemented and tested. Ready for real-world deployment and advanced feature development.

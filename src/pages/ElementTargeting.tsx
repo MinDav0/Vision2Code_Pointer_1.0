@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Target, Monitor, Code, Zap, AlertTriangle } from 'lucide-react'
+import { Target, Monitor, Code, Zap } from 'lucide-react'
 import { apiHelpers } from '../utils/api'
 
 interface TargetedElement {
@@ -38,12 +38,12 @@ export default function ElementTargeting() {
   const handleStartTargeting = () => {
     setIsTargeting(true)
     // In a real implementation, this would communicate with the Chrome extension
-    console.log('Starting element targeting mode...')
+    console.warn('Starting element targeting mode...')
   }
 
   const handleStopTargeting = () => {
     setIsTargeting(false)
-    console.log('Stopping element targeting mode...')
+    console.warn('Stopping element targeting mode...')
   }
 
   const analyzeElement = async (element: TargetedElement) => {
@@ -158,7 +158,7 @@ export default function ElementTargeting() {
                 
                 {selectedElement.textContent && (
                   <p className="text-sm text-l-text-2 dark:text-d-text-2 truncate">
-                    "{selectedElement.textContent}"
+                    &ldquo;{selectedElement.textContent}&rdquo;
                   </p>
                 )}
               </div>
@@ -245,7 +245,7 @@ export default function ElementTargeting() {
                   </p>
                   {element.textContent && (
                     <p className="text-xs text-l-text-2 dark:text-d-text-2 mt-1 truncate">
-                      "{element.textContent}"
+                      &ldquo;{element.textContent}&rdquo;
                     </p>
                   )}
                 </div>

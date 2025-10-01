@@ -57,7 +57,7 @@ export default function Dashboard() {
         ...healthData,
         ...statusData
       })
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(err.response?.data?.message || 'Failed to fetch system status')
     } finally {
       setIsLoading(false)
@@ -239,16 +239,4 @@ export default function Dashboard() {
   )
 }
 
-function formatUptime(seconds: number): string {
-  const hours = Math.floor(seconds / 3600)
-  const minutes = Math.floor((seconds % 3600) / 60)
-  const secs = Math.floor(seconds % 60)
-  
-  if (hours > 0) {
-    return `${hours}h ${minutes}m`
-  } else if (minutes > 0) {
-    return `${minutes}m ${secs}s`
-  } else {
-    return `${secs}s`
-  }
-}
+// Removed unused formatUptime function

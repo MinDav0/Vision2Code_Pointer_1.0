@@ -11,7 +11,7 @@ export default function Login() {
   const [error, setError] = useState('')
   
   const { login, isAuthenticated, isLoading } = useAuthStore()
-  const { theme } = useThemeStore()
+  // const { theme } = useThemeStore() // Removed unused variable
   const location = useLocation()
   
   const from = location.state?.from?.pathname || '/'
