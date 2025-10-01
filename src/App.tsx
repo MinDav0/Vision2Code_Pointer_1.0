@@ -20,7 +20,11 @@ function App() {
   }, [initializeTheme, checkAuth])
 
   useEffect(() => {
-    document.body.className = theme
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
   }, [theme])
 
   return (

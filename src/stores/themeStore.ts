@@ -10,34 +10,45 @@ interface ThemeState {
 }
 
 export const useThemeStore = create<ThemeState>((set, get) => ({
-  theme: 'light',
+  theme: 'dark',
   
   toggleTheme: () => {
     const newTheme = get().theme === 'light' ? 'dark' : 'light'
     set({ theme: newTheme })
-    document.body.className = newTheme
+    if (newTheme === 'dark') {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
     localStorage.setItem('mcp-pointer-theme', newTheme)
   },
   
   setTheme: (theme: Theme) => {
     set({ theme })
-    document.body.className = theme
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
     localStorage.setItem('mcp-pointer-theme', theme)
   },
   
   initializeTheme: () => {
+    // Always start with dark mode for cyber theme
+    const defaultTheme: Theme = 'dark'
+    set({ theme: defaultTheme })
+    document.documentElement.classList.add('dark')
+    localStorage.setItem('mcp-pointer-theme', defaultTheme)
+    
+    // Check if there's a stored preference
     const stored = localStorage.getItem('mcp-pointer-theme') as Theme | null
     if (stored && (stored === 'light' || stored === 'dark')) {
       set({ theme: stored })
-      document.body.className = stored
-      return
+      if (stored === 'dark') {
+        document.documentElement.classList.add('dark')
+      } else {
+        document.documentElement.classList.remove('dark')
+      }
     }
-    
-    // Check system preference
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-    const systemTheme: Theme = prefersDark ? 'dark' : 'light'
-    set({ theme: systemTheme })
-    document.body.className = systemTheme
-    localStorage.setItem('mcp-pointer-theme', systemTheme)
   },
 }))

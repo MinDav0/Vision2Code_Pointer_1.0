@@ -34,18 +34,28 @@ export default function Login() {
   return (
     <div className="min-h-screen flex bg-l-bg-1 dark:bg-d-bg-1">
       {/* Left side - Branding */}
-      <div className="hidden lg:flex lg:flex-1 lg:flex-col lg:justify-center lg:px-12 bg-accent-1">
-        <div className="text-center">
-          <div className="w-20 h-20 bg-white rounded-2xl flex items-center justify-center mx-auto mb-8">
-            <Zap className="w-10 h-10 text-accent-1" />
+      <div className="hidden lg:flex lg:flex-1 lg:flex-col lg:justify-center lg:px-12 bg-gradient-to-br from-indigo-600 to-purple-700 dark:from-slate-900 dark:to-slate-800 relative overflow-hidden">
+        {/* Subtle pattern overlay */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `
+              radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0)
+            `,
+            backgroundSize: '20px 20px'
+          }}></div>
+        </div>
+        
+        <div className="relative z-10 text-center">
+          <div className="w-20 h-20 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-8 border border-white/20 shadow-xl">
+            <Zap className="w-10 h-10 text-white" />
           </div>
-          <h1 className="text-4xl font-bold text-white mb-4">
+          <h1 className="text-4xl font-bold text-white mb-4 tracking-tight">
             MCP Pointer v2.2
           </h1>
-          <p className="text-xl text-blue-100 mb-8">
+          <p className="text-xl text-indigo-100 mb-8 max-w-md mx-auto">
             Element targeting for AI-assisted web development
           </p>
-          <div className="space-y-4 text-blue-100">
+          <div className="space-y-4 text-indigo-100">
             <div className="flex items-center justify-center space-x-3">
               <div className="w-2 h-2 bg-white rounded-full"></div>
               <span>Real-time element selection</span>
@@ -63,23 +73,24 @@ export default function Login() {
       </div>
 
       {/* Right side - Login form */}
-      <div className="flex-1 flex flex-col justify-center px-6 py-12 lg:px-8 max-w-md mx-auto lg:mx-0">
+      <div className="flex-1 flex flex-col justify-center px-6 py-12 lg:px-8 max-w-md mx-auto lg:mx-0 bg-white dark:bg-slate-900">
+        
         {/* Theme toggle */}
-        <div className="absolute top-6 right-6">
+        <div className="absolute top-6 right-6 z-10">
           <ThemeToggle />
         </div>
 
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <div className="flex justify-center lg:hidden mb-8">
-            <div className="w-16 h-16 bg-accent-1 rounded-xl flex items-center justify-center">
+            <div className="w-16 h-16 bg-indigo-600 dark:bg-purple-600 rounded-xl flex items-center justify-center shadow-lg">
               <Zap className="w-8 h-8 text-white" />
             </div>
           </div>
           
-          <h2 className="text-center text-2xl font-bold leading-9 tracking-tight text-l-text-1 dark:text-d-text-1">
+          <h2 className="text-center text-2xl font-bold leading-9 tracking-tight text-gray-900 dark:text-white">
             Sign in to your account
           </h2>
-          <p className="mt-2 text-center text-sm text-l-text-2 dark:text-d-text-2">
+          <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
             Access your MCP Pointer dashboard
           </p>
         </div>
@@ -94,11 +105,11 @@ export default function Login() {
 
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
-              <label htmlFor="email" className="block text-sm font-medium leading-6 text-l-text-1 dark:text-d-text-1">
+              <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
                 Email address
               </label>
               <div className="mt-2 relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-l-text-3 dark:text-d-text-3" />
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
                 <input
                   id="email"
                   name="email"
@@ -107,18 +118,18 @@ export default function Login() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-2 border border-border-l dark:border-border-d rounded-lg bg-l-bg-1 dark:bg-d-bg-1 text-l-text-1 dark:text-d-text-1 placeholder-l-text-3 dark:placeholder-d-text-3 focus:outline-none focus:ring-2 focus:ring-accent-1 focus:border-transparent"
+                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-purple-500 focus:border-transparent transition-colors"
                   placeholder="Enter your email"
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium leading-6 text-l-text-1 dark:text-d-text-1">
+              <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
                 Password
               </label>
               <div className="mt-2 relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-l-text-3 dark:text-d-text-3" />
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
                 <input
                   id="password"
                   name="password"
@@ -127,7 +138,7 @@ export default function Login() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-2 border border-border-l dark:border-border-d rounded-lg bg-l-bg-1 dark:bg-d-bg-1 text-l-text-1 dark:text-d-text-1 placeholder-l-text-3 dark:placeholder-d-text-3 focus:outline-none focus:ring-2 focus:ring-accent-1 focus:border-transparent"
+                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-purple-500 focus:border-transparent transition-colors"
                   placeholder="Enter your password"
                 />
               </div>
@@ -137,7 +148,7 @@ export default function Login() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="flex w-full justify-center rounded-lg bg-accent-1 px-3 py-2 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-accent-2 focus:outline-none focus:ring-2 focus:ring-accent-1 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="flex w-full justify-center rounded-md bg-indigo-600 dark:bg-purple-600 px-3 py-2 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 dark:hover:bg-purple-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-slate-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {isLoading ? (
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -149,7 +160,7 @@ export default function Login() {
           </form>
 
           <div className="mt-8 text-center">
-            <p className="text-xs text-l-text-3 dark:text-d-text-3">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
               MCP Pointer v2.2 - Production Ready
             </p>
           </div>
